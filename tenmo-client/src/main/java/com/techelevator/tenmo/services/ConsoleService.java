@@ -1,6 +1,7 @@
 package com.techelevator.tenmo.services;
 
 
+import com.techelevator.tenmo.model.AuthenticatedUser;
 import com.techelevator.tenmo.model.UserCredentials;
 
 import java.math.BigDecimal;
@@ -88,4 +89,7 @@ public class ConsoleService {
         System.out.println("An error occurred. Check the log for details.");
     }
 
+//    public void printCurrentBalance(BigDecimal balance) {
+//        System.out.println("Your current account balance is: " + );
+//    }
 }
