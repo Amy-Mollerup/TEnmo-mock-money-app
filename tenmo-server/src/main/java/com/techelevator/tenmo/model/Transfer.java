@@ -5,21 +5,21 @@ import java.math.BigDecimal;
 public class Transfer {
 
     private Long id;
-    private int typeId;
+    private int transferTypeId;
     private int transferStatusId;
-    private Long fromAccountId;
-    private Long toAccountId;
+    private Long accountFrom;
+    private Long accountTo;
     private BigDecimal amount;
 
     public Transfer() {
     }
 
-    public Transfer(Long id, int typeId, int transferStatusId, Long fromAccountId, Long toAccountId, BigDecimal amount) {
+    public Transfer(Long id, int transferTypeId, int transferStatusId, Long accountFrom, Long accountTo, BigDecimal amount) {
         this.id = id;
-        this.typeId = typeId;
+        this.transferTypeId = transferTypeId;
         this.transferStatusId = transferStatusId;
-        this.fromAccountId = fromAccountId;
-        this.toAccountId = toAccountId;
+        this.accountFrom = accountFrom;
+        this.accountTo = accountTo;
         this.amount = amount;
     }
 
@@ -31,12 +31,12 @@ public class Transfer {
         this.id = id;
     }
 
-    public int getTypeId() {
-        return typeId;
+    public int getTransferTypeId() {
+        return transferTypeId;
     }
 
-    public void setTypeId(int typeId) {
-        this.typeId = typeId;
+    public void setTransferTypeId(int transferTypeId) {
+        this.transferTypeId = transferTypeId;
     }
 
     public int getTransferStatusId() {
@@ -47,20 +47,20 @@ public class Transfer {
         this.transferStatusId = transferStatusId;
     }
 
-    public Long getFromAccountId() {
-        return fromAccountId;
+    public Long getAccountFrom() {
+        return accountFrom;
     }
 
-    public void setFromAccountId(Long fromAccountId) {
-        this.fromAccountId = fromAccountId;
+    public void setAccountFrom(Long accountFrom) {
+        this.accountFrom = accountFrom;
     }
 
-    public Long getToAccountId() {
-        return toAccountId;
+    public Long getAccountTo() {
+        return accountTo;
     }
 
-    public void setToAccountId(Long toAccountId) {
-        this.toAccountId = toAccountId;
+    public void setAccountTo(Long accountTo) {
+        this.accountTo = accountTo;
     }
 
     public BigDecimal getAmount() {
