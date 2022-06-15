@@ -9,7 +9,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
+
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -27,8 +27,7 @@ public class JdbcAccountDao implements AccountDao {
     }
 
 
-    @Override
-    //returns full list of accounts
+    @Override //returns full list of accounts - should we update this to be by userId?
     public List<Account> list() {
         List<Account> accounts = new ArrayList<>();
         String sql = "SELECT account_id FROM account;";
@@ -41,8 +40,7 @@ public class JdbcAccountDao implements AccountDao {
 
 
     //updated: per trainer notes, do not need to account for more than one account (accounts should be 1-1)
-    @Override
-    //returns specific account based on userId of receiver that sender must enter
+    @Override  //returns specific account based on userId of receiver that sender must enter
     public Account getAccount(long userId) throws UsernameNotFoundException {
         Account account1 = null;
         String sql = "SELECT account_id, user_id" + //not displaying balances for security purposes, will update balance in another method
@@ -58,7 +56,7 @@ public class JdbcAccountDao implements AccountDao {
     //added getBalance method so we can specifically pull just the balance from the account id, need to authenticate the
     //id belongs to the user and the user is authorized
     //isFullyAuthenticated() && hasRole('user')
-    @Override
+    @Override //retrieves current balance from account based on userId
     public BigDecimal getBalance(long userId) {
         BigDecimal balance = null;
         String sql = "SELECT balance FROM account " +
@@ -71,7 +69,7 @@ public class JdbcAccountDao implements AccountDao {
         return balance;
     }
 
-    @Override
+    @Override //adds to balance in account, returns updated balance
     public BigDecimal updateAddBalance(long userId, BigDecimal amount) { // passing userId so method can be called in transfers, amount to update bal by
     Account account = getAccount(userId);
     BigDecimal newBal = account.getBalance().add(amount);
@@ -92,7 +90,7 @@ public class JdbcAccountDao implements AccountDao {
 
     }
 
-    @Override
+    @Override //subtracts from balance in account, returns updated balance
     public BigDecimal updateSubtractBalance(long userId, BigDecimal amount) throws UserNotAuthorizedException, BalanceNotZeroException {
         Account account = getAccount(userId);
         BigDecimal newBal = account.getBalance().subtract(amount);
@@ -109,7 +107,7 @@ public class JdbcAccountDao implements AccountDao {
         return account.getBalance();
     }
 
-    @Override
+    @Override //will delete account as long as balance is at zero - do we need to include delete user too since create user includes delete?
     public void delete(long accountId, long userId) throws BalanceNotZeroException {
         String delete = "DELETE FROM account WHERE " +
                 "account_id = ? AND user_id = ?";
