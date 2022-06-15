@@ -4,6 +4,7 @@ import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.security.UserNotAuthorizedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface AccountDao {
@@ -18,7 +19,7 @@ public interface AccountDao {
     //may need to change exception
     Account getAccount(long userId) throws UsernameNotFoundException;
 
-    Account getBalance(long userId) throws UserNotAuthorizedException;
+    BigDecimal getBalance(long userId) throws UserNotAuthorizedException;
     //user needs to be authorized to view balance
 
     //Account create(Account account);

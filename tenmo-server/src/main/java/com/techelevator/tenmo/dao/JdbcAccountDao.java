@@ -1,15 +1,23 @@
 package com.techelevator.tenmo.dao;
 
 import com.techelevator.tenmo.model.Account;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+
+@Component
 public class JdbcAccountDao implements AccountDao {
 
+    @Autowired
     private JdbcTemplate jdbcTemplate;
 
     public JdbcAccountDao(JdbcTemplate jdbcTemplate) {
@@ -48,17 +56,17 @@ public class JdbcAccountDao implements AccountDao {
     //added getBalance method so we can specifically pull just the balance from the account id, need to authenticate the
     //id belongs to the user and the user is authorized
     //isFullyAuthenticated() && hasRole('user')
-    //should this maybe be in transfer so we can create a balance object?
     @Override
-    public Account getBalance(long userId) {
-        Account account = null;
+    public BigDecimal getBalance(long userId) {
+        BigDecimal balance = null;
         String sql = "SELECT balance FROM account " +
                 "WHERE  user_id = ?;";
-        SqlRowSet results = jdbcTemplate.queryForRowSet(sql);
-        if (results.next()) {
-            account = mapRowToAccount(results);
+        try {
+            balance = jdbcTemplate.queryForObject(sql, BigDecimal.class, userId);
+        } catch (DataAccessException e) {
+            System.out.println("Error accessing balance");
         }
-        return account;
+        return balance;
     }
 
 
