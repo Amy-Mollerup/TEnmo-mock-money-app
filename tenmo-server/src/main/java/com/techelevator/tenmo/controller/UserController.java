@@ -19,9 +19,19 @@ public class UserController {
 
     public UserController(UserDao dao) { this.dao = dao; }
 
+    @GetMapping("/id/{username}")
+    public int findIdByUsername(@PathVariable String username) {
+        return dao.findIdByUsername(username);
+    }
+
     @GetMapping
     public List<User> list() {
         return dao.findAll();
+    }
+
+    @GetMapping("/{username}")
+    public User findUserByUsername(@PathVariable String username) {
+        return dao.findByUsername(username);
     }
 
     @PostMapping

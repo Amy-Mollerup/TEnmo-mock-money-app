@@ -20,14 +20,14 @@ public interface AccountDao {
     BigDecimal getBalance(long userId) throws UserNotAuthorizedException;
     //user needs to be authorized to view balance
 
-    BigDecimal updateAddBalance(long userId, BigDecimal amount) throws UserNotAuthorizedException;
+    BigDecimal deposit(long userId, BigDecimal amount) throws UserNotAuthorizedException;
 
-    Account updateBalance(int balance, long id);
+//    Account updateBalance(int balance, long id);
 
-    BigDecimal updateSubtractBalance(long userId, BigDecimal amount) throws UserNotAuthorizedException;
+    BigDecimal withdraw(long userId, BigDecimal amount) throws UserNotAuthorizedException;
     //can also have this throw balance cannot be 0 exception
 
-    void delete(long accountId, long userId) throws UserNotAuthorizedException;
+ //   void delete(long accountId, long userId) throws UserNotAuthorizedException;
     //throw exception if not authorized
     //add exception for if balance is not zero, let user know to withdraw remaining funds before proceeding
 

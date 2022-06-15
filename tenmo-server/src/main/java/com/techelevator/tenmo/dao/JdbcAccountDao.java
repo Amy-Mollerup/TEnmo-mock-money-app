@@ -73,7 +73,7 @@ public class JdbcAccountDao implements AccountDao {
     }
 
     @Override //adds to balance in account, returns updated balance
-    public BigDecimal updateAddBalance(long userId, BigDecimal amount)
+    public BigDecimal deposit(long userId, BigDecimal amount)
         { // passing userId so method can be called in transfers, amount to update bal by
             Account account = getAccountById(userId);
             BigDecimal newBal = account.getBalance().add(amount);
@@ -89,7 +89,7 @@ public class JdbcAccountDao implements AccountDao {
             } catch (DataAccessException e) {
                 System.out.println("Error accessing data");
             }
-            System.out.println("New Balance: ");
+            System.out.print("New Balance: ");
             return account.getBalance();
 
         }
@@ -107,19 +107,19 @@ public class JdbcAccountDao implements AccountDao {
 
         }*/
 
-
-    @Override
-    public Account updateBalance(int balance, long id) {
-        //we need update balance methods but do we need update accounts for anything?
-        String update = "UPDATE balance SET balance = ? " +
-                "WHERE account_id = ?;";
-        jdbcTemplate.update(update, balance, id);
-        return null;
-    }
+//
+//    @Override
+//    public Account updateBalance(int balance, long id) {
+//        //we need update balance methods but do we need update accounts for anything?
+//        String update = "UPDATE balance SET balance = ? " +
+//                "WHERE account_id = ?;";
+//        jdbcTemplate.update(update, balance, id);
+//        return null;
+//    }
 
 
     @Override //subtracts from balance in account, returns updated balance
-    public BigDecimal updateSubtractBalance(long userId, BigDecimal amount) throws UserNotAuthorizedException, BalanceNotZeroException {
+    public BigDecimal withdraw(long userId, BigDecimal amount) throws UserNotAuthorizedException, BalanceNotZeroException {
         Account account = getAccountById(userId);
         BigDecimal newBal = account.getBalance().subtract(amount);
         String sql = "UPDATE account SET balance = ? " +
@@ -131,20 +131,20 @@ public class JdbcAccountDao implements AccountDao {
         } catch (DataAccessException e) {
             System.out.println("Error accessing data");
         }
-        System.out.println("New Balance: ");
+        System.out.print("New Balance: ");
         return account.getBalance();
     }
 
-    @Override //will delete account as long as balance is at zero - do we need to include delete user too since create user includes delete?
-    public void delete(long accountId, long userId) throws BalanceNotZeroException {
-        String delete = "DELETE FROM account WHERE " +
-                "account_id = ? AND user_id = ?";
-            try {
-            jdbcTemplate.update(delete, accountId, userId);
-        } catch (UserNotAuthorizedException e) { //throw if user is not auth (user needs to own account)
-                System.out.println(e.getMessage());
-            }
-    }
+//    @Override //will delete account as long as balance is at zero - do we need to include delete user too since create user includes delete?
+//    public void delete(long accountId, long userId) throws BalanceNotZeroException {
+//        String delete = "DELETE FROM account WHERE " +
+//                "account_id = ? AND user_id = ?";
+//            try {
+//            jdbcTemplate.update(delete, accountId, userId);
+//        } catch (UserNotAuthorizedException e) { //throw if user is not auth (user needs to own account)
+//                System.out.println(e.getMessage());
+//            }
+//    }
 
     private Account mapRowToAccount(SqlRowSet rowSet) {
         Account account = new Account();
