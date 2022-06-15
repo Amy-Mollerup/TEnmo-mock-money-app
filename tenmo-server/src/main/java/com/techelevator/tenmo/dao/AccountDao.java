@@ -1,5 +1,6 @@
 package com.techelevator.tenmo.dao;
 
+import com.techelevator.tenmo.exceptions.TransferAttemptExceedsAccountBalException;
 import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.exceptions.UserNotAuthorizedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -24,7 +25,7 @@ public interface AccountDao {
 
 //    Account updateBalance(int balance, long id);
 
-    BigDecimal withdraw(long userId, BigDecimal amount) throws UserNotAuthorizedException;
+    BigDecimal withdraw(long userId, BigDecimal amount) throws UserNotAuthorizedException, TransferAttemptExceedsAccountBalException;
     //can also have this throw balance cannot be 0 exception
 
  //   void delete(long accountId, long userId) throws UserNotAuthorizedException;

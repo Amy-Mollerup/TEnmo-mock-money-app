@@ -1,6 +1,8 @@
 package com.techelevator.tenmo.dao;
 
 import com.techelevator.tenmo.exceptions.BalanceNotZeroException;
+import com.techelevator.tenmo.exceptions.TransferAmountZeroOrLessException;
+import com.techelevator.tenmo.exceptions.TransferAttemptExceedsAccountBalException;
 import com.techelevator.tenmo.exceptions.UserNotAuthorizedException;
 import com.techelevator.tenmo.model.Account;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,10 +12,11 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.math.BigDecimal.*;
 
 
 @Component
@@ -31,7 +34,7 @@ public class JdbcAccountDao implements AccountDao {
     //possibly remove when we do front end
     public List<Account> list() {
         List<Account> accounts = new ArrayList<>();
-        String sql = "SELECT * FROM account;";
+        String sql = "SELECT account_id FROM account;";
         SqlRowSet results = jdbcTemplate.queryForRowSet(sql);
         while (results.next()) {
             accounts.add(mapRowToAccount(results));
@@ -43,10 +46,12 @@ public class JdbcAccountDao implements AccountDao {
     //updated: per trainer notes, do not need to account for more than one account (accounts should be 1-1)
     @Override
     //returns specific account based on userId of receiver that sender must enter
+    //works in postman
     public Account getAccountById(long userId) throws UsernameNotFoundException {
 
         Account account1 = null;
-        String sql = "SELECT * FROM account " +
+        String sql = "SELECT * " + //not displaying balances for security purposes, will update balance in another method
+                "FROM account " +
                 "WHERE user_id = ?;";
         SqlRowSet results = jdbcTemplate.queryForRowSet(sql, userId);
         if (results.next()) {
@@ -73,24 +78,24 @@ public class JdbcAccountDao implements AccountDao {
 
     @Override //adds to balance in account, returns updated balance
     public BigDecimal deposit(long userId, BigDecimal amount)
-        { // passing userId so method can be called in transfers, amount to update bal by
-            Account account = getAccountById(userId);
-            BigDecimal newBal = account.getBalance().add(amount);
-            String sql = "UPDATE account SET balance = ? " +
-                    "WHERE user_id = ?;";
-            try {
-                jdbcTemplate.update(sql, newBal, userId);
-            } catch (UserNotAuthorizedException e) {
-                System.out.println(e.getMessage());
-            }
-            try {
-                jdbcTemplate.update(sql, newBal, userId);
-            } catch (DataAccessException e) {
-                System.out.println("Error accessing data");
-            }
-            account.setBalance(getBalance(userId));
-            return account.getBalance();
+    { // passing userId so method can be called in transfers, amount to update bal by
+        Account account = getAccountById(userId);
+        BigDecimal newBal = account.getBalance().add(amount);
+        String sql = "UPDATE account SET balance = ? " +
+                "WHERE user_id = ?;";
+        try {
+            jdbcTemplate.update(sql, newBal, userId);
+        } catch (UserNotAuthorizedException e) {
+            System.out.println(e.getMessage());
         }
+        try {
+            jdbcTemplate.update(sql, newBal, userId);
+        } catch (DataAccessException e) {
+            System.out.println("Error accessing data");
+        }
+        return account.getBalance();
+
+    }
     /*@Override
     //need update balance method -- initial account creation does not require balance, need to add at least 0 to account
     //account_id serial?
@@ -105,31 +110,25 @@ public class JdbcAccountDao implements AccountDao {
 
         }*/
 
-//
-//    @Override
-//    public Account updateBalance(int balance, long id) {
-//        //we need update balance methods but do we need update accounts for anything?
-//        String update = "UPDATE balance SET balance = ? " +
-//                "WHERE account_id = ?;";
-//        jdbcTemplate.update(update, balance, id);
-//        return null;
-//    }
-
 
     @Override //subtracts from balance in account, returns updated balance
-    public BigDecimal withdraw(long userId, BigDecimal amount) throws UserNotAuthorizedException, BalanceNotZeroException {
+    //BIG DECIMAL SUCKS - will throw numberformatexception if less than 0
+    public BigDecimal withdraw(long userId, BigDecimal amount) throws TransferAmountZeroOrLessException, TransferAttemptExceedsAccountBalException {
         Account account = getAccountById(userId);
         BigDecimal newBal = account.getBalance().subtract(amount);
-        String sql = "UPDATE account SET balance = ? " +
-                "WHERE user_id = ?;";
-        try {
-            jdbcTemplate.update(sql, newBal, userId);
-        } catch (UserNotAuthorizedException e) {
-            System.out.println(e.getMessage());
-        } catch (DataAccessException e) {
-            System.out.println("Error accessing data");
+        if(newBal.compareTo(ZERO) >= 0 && amount.compareTo(ZERO) > 0) {
+            String sql = "UPDATE account SET balance = ? " +
+                    "WHERE user_id = ?;";
+            try {
+                jdbcTemplate.update(sql, newBal, userId);
+            } catch (DataAccessException e) {
+                System.out.println("Error accessing data");
+            }
+        } else if(amount.compareTo(ZERO) <= 0) {
+            throw new TransferAmountZeroOrLessException();
+        } else if(newBal.compareTo(ZERO) < 0) {
+            throw new TransferAttemptExceedsAccountBalException();
         }
-        account.setBalance(getBalance(userId));
         return account.getBalance();
     }
 

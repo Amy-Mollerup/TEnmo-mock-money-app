@@ -20,21 +20,25 @@ public class UserController {
     public UserController(UserDao dao) { this.dao = dao; }
 
     @GetMapping("/id/{username}")
+    //works in postman
     public int findIdByUsername(@PathVariable String username) {
         return dao.findIdByUsername(username);
     }
 
-    @GetMapping
+    @GetMapping("/allusers")
+    //works in postman
     public List<User> list() {
         return dao.findAll();
     }
 
     @GetMapping("/{username}")
+    //works in postman
     public User findUserByUsername(@PathVariable String username) {
         return dao.findByUsername(username);
     }
 
-    @PostMapping
+    @PostMapping("/create")
+    //works in postman
     public void createUser(@RequestBody User user) {
         dao.create(user.getUsername(), user.getPassword());
     }
