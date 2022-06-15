@@ -35,5 +35,4 @@ public class AccountController {
         return accountDao.getBalance(id);
     }
 
-
 }

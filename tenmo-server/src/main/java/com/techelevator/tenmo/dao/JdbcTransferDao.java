@@ -1,11 +1,14 @@
 package com.techelevator.tenmo.dao;
 
+import com.techelevator.tenmo.exceptions.TransferAmountZeroOrLessException;
 import com.techelevator.tenmo.model.Transfer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 
+import javax.xml.crypto.Data;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,29 +58,35 @@ public class JdbcTransferDao implements TransferDao {
         // TODO create custom Exception
     }
 
-    @Override
+    @Override //sending actual transfer to user
     public boolean createSendTransfer(Long accountFrom, Long accountTo, BigDecimal amount) {
         // TODO update balances to reflect the amount transferred
         String sql = "INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount) " +
                 "VALUES (1, 2, ?, ?)";
         try {
             jdbcTemplate.queryForRowSet(sql, accountFrom, accountTo);
-        } catch (Exception e) {
-            // TODO create custom Exception
+        } catch (TransferAmountZeroOrLessException e) {
+            System.out.println(e.getMessage());
+            return false;
+        } catch (DataAccessException e) {
+            System.out.println("Error accessing data");
             return false;
         }
         return true;
     }
 
-    @Override
+    @Override //setting up our transfer requests from one user to another
     public boolean createRequestTransfer(Long accountFrom, Long accountTo, BigDecimal amount) {
         // TODO update balances to reflect the amount transferred
         String sql = "INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount) " +
                 "VALUES (2, 1, ?, ?)";
         try {
             jdbcTemplate.queryForRowSet(sql, accountFrom, accountTo);
-        } catch (Exception e) {
-            // TODO create custom Exception
+        } catch (TransferAmountZeroOrLessException e) {
+            System.out.println(e.getMessage());
+            return false;
+        } catch(DataAccessException e) {
+            System.out.println("Error accessing data");
             return false;
         }
         return true;
@@ -89,8 +98,8 @@ public class JdbcTransferDao implements TransferDao {
                 "WHERE transfer_id = ?;";
         try {
             jdbcTemplate.queryForRowSet(sql, transferStatusId, transferId);
-        } catch (Exception e) {
-            // TODO create custom Exception
+        } catch (DataAccessException e) {
+            System.out.println("Error accessing data");
             return false;
         }
         return true;

@@ -1,4 +1,4 @@
-package com.techelevator.tenmo.security;
+package com.techelevator.tenmo.exceptions;
 
 
 import org.springframework.http.HttpStatus;
