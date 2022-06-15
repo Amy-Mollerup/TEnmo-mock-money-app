@@ -18,4 +18,6 @@ public interface TransferDao {
     boolean createRequestTransfer(Long accountFrom, Long accountTo, BigDecimal amount);
 
     boolean updateTransferStatus(Long transferId, int transferStatusId);
+
+    String getTransferStatus(Long transferId);
 }

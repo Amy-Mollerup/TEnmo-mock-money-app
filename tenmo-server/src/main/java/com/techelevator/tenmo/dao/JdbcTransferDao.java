@@ -1,6 +1,7 @@
 package com.techelevator.tenmo.dao;
 
 import com.techelevator.tenmo.exceptions.TransferAmountZeroOrLessException;
+import com.techelevator.tenmo.exceptions.TransferIdDoesNotExistException;
 import com.techelevator.tenmo.model.Transfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -47,16 +48,17 @@ public class JdbcTransferDao implements TransferDao {
         return transfers;
     }
 
-    @Override
-    public Transfer findByTransferId(Long id) throws Exception {
+    @Override //locating transfer by id
+    public Transfer findByTransferId(Long id) throws TransferIdDoesNotExistException {
+        Transfer transfer = null;
         String sql = "SELECT * FROM transfer WHERE transfer_id = ?";
         SqlRowSet results = jdbcTemplate.queryForRowSet(sql, id);
         if (results.next()) {
-            return mapRowToTransfer(results);
+             transfer = mapRowToTransfer(results);
         }
-        throw new Exception("Transfer ID not found");
-        // TODO create custom Exception
+        return transfer;
     }
+
 
     @Override //sending actual transfer to user
     public boolean createSendTransfer(Long accountFrom, Long accountTo, BigDecimal amount) {
@@ -104,6 +106,24 @@ public class JdbcTransferDao implements TransferDao {
         }
         return true;
     }
+
+    @Override //retrieves transfer status description
+    public String getTransferStatus(Long id) throws TransferIdDoesNotExistException {
+        String transferStatus = null;
+        String sql = "SELECT transfer_type_desc FROM transfer_type " +
+                    "JOIN transfer ON transfer_type.transfer_type_id = transfer.transfer_type_id " +
+                    "WHERE transfer_id = ?;";
+        try {
+            transferStatus = String.valueOf(jdbcTemplate.queryForRowSet(sql, id));
+        } catch (TransferIdDoesNotExistException e) {
+            System.out.println(e.getMessage());
+        } catch (DataAccessException e ) {
+            System.out.println("Error accessing data");
+        }
+        return transferStatus;
+
+    }
+
 
     private Transfer mapRowToTransfer(SqlRowSet results) {
         Transfer transfer = new Transfer();

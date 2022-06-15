@@ -2,11 +2,13 @@ package com.techelevator.tenmo.controller;
 
 import com.techelevator.tenmo.dao.AccountDao;
 import com.techelevator.tenmo.dao.TransferDao;
+import com.techelevator.tenmo.exceptions.TransferIdDoesNotExistException;
 import com.techelevator.tenmo.model.Transfer;
 import org.apache.commons.logging.Log;
 import com.techelevator.util.BasicLogger;
 import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.ResourceAccessException;
@@ -29,12 +31,17 @@ public class TransferController {
     }
 
     @GetMapping //get transfer by id
-    public Transfer getTransferById(@PathVariable Long id) throws Exception {
-       Transfer transferByID = transferDao.findByTransferId(id);
-       return transferByID;
+    public Transfer getTransferById(@PathVariable Long id) throws TransferIdDoesNotExistException {
+        Transfer transferByID = null;
+        try {
+            transferByID = transferDao.findByTransferId(id);
+        } catch (RestClientResponseException e) {
+            BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
+        } catch (Exception e) {
+            BasicLogger.log(e.getMessage());
+        }
+        return transferByID;
     }
-    @GetMapping //get transfer by type (needs to be coming from the logged in user to view all the types of transfers they've made so far)
-
 
     @PostMapping
     public boolean createSendTransfer(@RequestBody Transfer transfer) {
@@ -51,6 +58,7 @@ public class TransferController {
         return success;
     }
 
+
     @PostMapping
     public boolean createRequestTransfer(@RequestBody Transfer transfer) {
         boolean success = false;
@@ -58,6 +66,22 @@ public class TransferController {
             transferDao.createRequestTransfer(transfer.getAccountFrom(), transfer.getAccountTo(), transfer.getAmount());
             success = true;
         } catch (RestClientResponseException e) {
+            BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
+        }
+        catch (ResourceAccessException e) {
+            BasicLogger.log(e.getMessage());
+        }
+        return success;
+    }
+
+    @PostMapping
+    public boolean updateTransferStatus(@RequestBody Transfer transfer, @PathVariable Long transferId, int transferStatusId) throws TransferIdDoesNotExistException {
+        boolean success = false;
+        try {
+            transferDao.updateTransferStatus(transferId, transferStatusId);
+            success = true;
+        }
+        catch (RestClientResponseException e) {
             BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
         }
         catch (ResourceAccessException e) {

@@ -28,6 +28,7 @@ public class JdbcAccountDao implements AccountDao {
 
 
     @Override //returns full list of accounts - should we update this to be by userId?
+    //possibly remove when we do front end
     public List<Account> list() {
         List<Account> accounts = new ArrayList<>();
         String sql = "SELECT account_id FROM account;";
