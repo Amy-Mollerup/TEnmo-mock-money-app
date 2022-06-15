@@ -43,7 +43,7 @@ public class TransferController {
         return transferByID;
     }
 
-    @PostMapping
+    @PostMapping("/send")
     public boolean createSendTransfer(@RequestBody Transfer transfer) {
         boolean success = false;
         try {
@@ -59,7 +59,7 @@ public class TransferController {
     }
 
 
-    @PostMapping
+    @PostMapping("/request")
     public boolean createRequestTransfer(@RequestBody Transfer transfer) {
         boolean success = false;
         try {
@@ -74,8 +74,8 @@ public class TransferController {
         return success;
     }
 
-    @PostMapping
-    public boolean updateTransferStatus(@RequestBody Transfer transfer, @PathVariable Long transferId, int transferStatusId) throws TransferIdDoesNotExistException {
+    @PutMapping("/update/{id}")
+    public boolean updateTransferStatus(@RequestParam int transferStatusId, @PathVariable Long transferId) throws TransferIdDoesNotExistException {
         boolean success = false;
         try {
             transferDao.updateTransferStatus(transferId, transferStatusId);

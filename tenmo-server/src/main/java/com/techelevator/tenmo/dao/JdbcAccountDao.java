@@ -31,7 +31,7 @@ public class JdbcAccountDao implements AccountDao {
     //possibly remove when we do front end
     public List<Account> list() {
         List<Account> accounts = new ArrayList<>();
-        String sql = "SELECT account_id FROM account;";
+        String sql = "SELECT * FROM account;";
         SqlRowSet results = jdbcTemplate.queryForRowSet(sql);
         while (results.next()) {
             accounts.add(mapRowToAccount(results));
@@ -46,8 +46,7 @@ public class JdbcAccountDao implements AccountDao {
     public Account getAccountById(long userId) throws UsernameNotFoundException {
 
         Account account1 = null;
-        String sql = "SELECT account_id, user_id" + //not displaying balances for security purposes, will update balance in another method
-                "FROM account " +
+        String sql = "SELECT * FROM account " +
                 "WHERE user_id = ?;";
         SqlRowSet results = jdbcTemplate.queryForRowSet(sql, userId);
         if (results.next()) {
@@ -89,9 +88,8 @@ public class JdbcAccountDao implements AccountDao {
             } catch (DataAccessException e) {
                 System.out.println("Error accessing data");
             }
-            System.out.print("New Balance: ");
+            account.setBalance(getBalance(userId));
             return account.getBalance();
-
         }
     /*@Override
     //need update balance method -- initial account creation does not require balance, need to add at least 0 to account
@@ -131,7 +129,7 @@ public class JdbcAccountDao implements AccountDao {
         } catch (DataAccessException e) {
             System.out.println("Error accessing data");
         }
-        System.out.print("New Balance: ");
+        account.setBalance(getBalance(userId));
         return account.getBalance();
     }
 
