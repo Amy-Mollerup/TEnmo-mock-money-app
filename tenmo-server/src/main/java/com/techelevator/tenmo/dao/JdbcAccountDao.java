@@ -41,7 +41,7 @@ public class JdbcAccountDao implements AccountDao {
     //updated: per trainer notes, do not need to account for more than one account (accounts should be 1-1)
     @Override
     //returns specific account based on userId of receiver that sender must enter
-    public Account getAccount(long userId) throws UsernameNotFoundException {
+    public Account getAccountById(long userId) throws UsernameNotFoundException {
         Account account1 = null;
         String sql = "SELECT account_id, user_id" + //not displaying balances for security purposes, will update balance in another method
                 "FROM account " +
@@ -87,8 +87,10 @@ public class JdbcAccountDao implements AccountDao {
 
     @Override
     //we need update balance methods but do we need update accounts for anything?
-    public Account update(Account account, long id) {
-        return null;
+    public Account updateBalance(int balance, long id) {
+        String update = "UPDATE balance SET balance = ? " +
+                "WHERE account_id = ?;";
+        jdbcTemplate.update(update, balance, id);
 
     }
 
@@ -97,7 +99,7 @@ public class JdbcAccountDao implements AccountDao {
     //balance should be 0 to delete otherwise return money (exception message)
     public void delete(long accountId, long userId) {
         String delete = "DELETE FROM account WHERE " +
-                "account_id = ? AND user_id = ?";
+                "account_id = ? AND user_id = ?;";
         jdbcTemplate.update(delete, accountId, userId);
 
     }

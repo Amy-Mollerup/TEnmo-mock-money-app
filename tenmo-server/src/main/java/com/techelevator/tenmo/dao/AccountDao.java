@@ -17,7 +17,7 @@ public interface AccountDao {
     //users don't specifically have more than one account id, may look into further
     //updated: per trainer notes, do not need to account for more than one account (accounts should be 1-1)
     //may need to change exception
-    Account getAccount(long userId) throws UsernameNotFoundException;
+    Account getAccountById(long userId) throws UsernameNotFoundException;
 
     BigDecimal getBalance(long userId) throws UserNotAuthorizedException;
     //user needs to be authorized to view balance
