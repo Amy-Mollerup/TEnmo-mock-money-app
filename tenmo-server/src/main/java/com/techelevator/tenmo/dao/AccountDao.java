@@ -1,6 +1,7 @@
 package com.techelevator.tenmo.dao;
 
 import com.techelevator.tenmo.model.Account;
+import com.techelevator.tenmo.security.UserNotAuthorizedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.List;
@@ -17,16 +18,17 @@ public interface AccountDao {
     //may need to change exception
     Account getAccount(long userId) throws UsernameNotFoundException;
 
-    Account getBalance(long userId);
+    Account getBalance(long userId) throws UserNotAuthorizedException;
+    //user needs to be authorized to view balance
 
-    Account create(Account account);
+    //Account create(Account account);
 
-    Account update(Account account, long accountId);
+    Account update(Account account, long accountId) throws UserNotAuthorizedException;
     //throw exception -- may need to make one that is for user not authorized to update or access
 
-    void delete(long accountId, long userId);
+    void delete(long accountId, long userId) throws UserNotAuthorizedException;
     //throw exception -- may need to make one that is for user not authorized to update or access
-    //add exception for if balance is not zero, let user know to withdraw remaining funds before proceeding
+    //add exception for if balance is not zero, let user know to withdraw remaining funds before proceeding?
 
 
 }

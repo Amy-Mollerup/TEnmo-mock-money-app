@@ -47,6 +47,7 @@ public class JdbcAccountDao implements AccountDao {
 
     //added getBalance method so we can specifically pull just the balance from the account id, need to authenticate the
     //id belongs to the user and the user is authorized
+    //isFullyAuthenticated() && hasRole('user')
     //should this maybe be in transfer so we can create a balance object?
     @Override
     public Account getBalance(long userId) {
@@ -61,7 +62,7 @@ public class JdbcAccountDao implements AccountDao {
     }
 
 
-    @Override
+    /*@Override
     //need update balance method -- initial account creation does not require balance, need to add at least 0 to account
     //account_id serial?
     //user id comes from when user is created, does there need to be a join statement here?
@@ -72,7 +73,9 @@ public class JdbcAccountDao implements AccountDao {
         long accountId = (jdbcTemplate.queryForObject(create, Long.class, newAccount.getUserId(), newAccount.getBalance()));
         newAccount.setAccountId(accountId);
         return newAccount;
-    }
+
+        }*/
+
 
     @Override
     //we need update balance methods but do we need update accounts for anything?
