@@ -22,6 +22,8 @@ public interface AccountDao {
 
     BigDecimal updateAddBalance(long userId, BigDecimal amount) throws UserNotAuthorizedException;
 
+    Account updateBalance(int balance, long id);
+
     BigDecimal updateSubtractBalance(long userId, BigDecimal amount) throws UserNotAuthorizedException;
     //can also have this throw balance cannot be 0 exception
 
