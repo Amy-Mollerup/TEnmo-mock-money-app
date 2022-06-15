@@ -33,8 +33,7 @@ public class TransferController {
        Transfer transferByID = transferDao.findByTransferId(id);
        return transferByID;
     }
-    @GetMapping //get transfer by type
-
+    @GetMapping //get transfer by type (needs to be coming from the logged in user to view all the types of transfers they've made so far)
 
 
     @PostMapping
@@ -51,6 +50,22 @@ public class TransferController {
         }
         return success;
     }
+
+    @PostMapping
+    public boolean createRequestTransfer(@RequestBody Transfer transfer) {
+        boolean success = false;
+        try {
+            transferDao.createRequestTransfer(transfer.getAccountFrom(), transfer.getAccountTo(), transfer.getAmount());
+            success = true;
+        } catch (RestClientResponseException e) {
+            BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
+        }
+        catch (ResourceAccessException e) {
+            BasicLogger.log(e.getMessage());
+        }
+        return success;
+    }
+
 
 
 

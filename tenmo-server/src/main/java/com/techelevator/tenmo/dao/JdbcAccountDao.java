@@ -72,7 +72,6 @@ public class JdbcAccountDao implements AccountDao {
     }
 
     @Override
-    //make update balance method - return bigdecimal
     public BigDecimal updateAddBalance(long userId, BigDecimal amount) { // passing userId so method can be called in transfers, amount to update bal by
     Account account = getAccount(userId);
     BigDecimal newBal = account.getBalance().add(amount);
@@ -94,7 +93,7 @@ public class JdbcAccountDao implements AccountDao {
     }
 
     @Override
-    public BigDecimal updateSubtractBalance(long userId, BigDecimal amount) throws UserNotAuthorizedException {
+    public BigDecimal updateSubtractBalance(long userId, BigDecimal amount) throws UserNotAuthorizedException, BalanceNotZeroException {
         Account account = getAccount(userId);
         BigDecimal newBal = account.getBalance().subtract(amount);
         String sql = "UPDATE account SET balance = ? " +
@@ -103,14 +102,6 @@ public class JdbcAccountDao implements AccountDao {
             jdbcTemplate.update(sql, newBal, userId);
         } catch (UserNotAuthorizedException e) {
             System.out.println(e.getMessage());
-        }
-        try {
-            jdbcTemplate.update(sql, newBal, userId);
-        } catch (BalanceNotZeroException e ) {
-            System.out.println(e.getMessage());
-        }
-        try {
-            jdbcTemplate.update(sql, newBal, userId);
         } catch (DataAccessException e) {
             System.out.println("Error accessing data");
         }
@@ -119,15 +110,12 @@ public class JdbcAccountDao implements AccountDao {
     }
 
     @Override
-    public void delete(long accountId, long userId) {
+    public void delete(long accountId, long userId) throws BalanceNotZeroException {
         String delete = "DELETE FROM account WHERE " +
                 "account_id = ? AND user_id = ?";
             try {
             jdbcTemplate.update(delete, accountId, userId);
         } catch (UserNotAuthorizedException e) { //throw if user is not auth (user needs to own account)
-                System.out.println(e.getMessage());
-            } try { jdbcTemplate.update(delete, accountId, userId);
-             } catch (BalanceNotZeroException e) { //throw if money is still in account
                 System.out.println(e.getMessage());
             }
     }
