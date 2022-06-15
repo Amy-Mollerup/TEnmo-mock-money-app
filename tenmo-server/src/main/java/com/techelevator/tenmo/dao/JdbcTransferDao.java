@@ -27,6 +27,7 @@ public class JdbcTransferDao implements TransferDao {
     }
 
     @Override
+    //we have a method in account that finds by userId
     public List<Transfer> findByAccountId(Long accountId) {
         List<Transfer> transfers = new ArrayList<>();
         String sql = "SELECT * FROM transfer WHERE account_from ILIKE ? OR account_to ILIKE ?;";

@@ -56,6 +56,8 @@ public class JdbcUserDao implements UserDao {
     }
 
     @Override
+    //did this come with the initial project?
+    //removed my create account method from the jdbcaccountdao since this handles it
     public boolean create(String username, String password) {
 
         // create user
