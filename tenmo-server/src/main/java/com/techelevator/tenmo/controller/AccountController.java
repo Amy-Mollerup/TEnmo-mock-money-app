@@ -24,9 +24,9 @@ public class AccountController {
         return accountDao.list();
     }
 
-    @GetMapping("/{userId}")
-    public Account getAccountById(@PathVariable long userId) {
-        return accountDao.getAccountById(userId);
+    @GetMapping("/{accountId}")
+    public Account getAccountById(@PathVariable long accountId) {
+        return accountDao.find(accountId);
     }
 
     @GetMapping("/{userId}/balance")
@@ -34,15 +34,17 @@ public class AccountController {
         return accountDao.getBalance(userId);
     }
 
-    @PutMapping("/{userId}/deposit")
-    public BigDecimal deposit(@PathVariable long userId, @RequestBody String amount) {
+    @PutMapping("/{accountId}/deposit")
+    public BigDecimal deposit(@PathVariable long accountId, @RequestBody String amount) {
         //Ran into error using @RequestBody, could not parse BigDecimal, could try to fix later
-        return accountDao.deposit(userId, BigDecimal.valueOf(Double.parseDouble(amount)));
+        return accountDao.deposit(accountId, BigDecimal.valueOf(Double.parseDouble(amount)));
     }
 
-    @PutMapping("/{userId}/withdraw")
-    public BigDecimal withdraw(@PathVariable long userId, @RequestBody String amount) {
-        return accountDao.withdraw(userId, BigDecimal.valueOf(Double.parseDouble(amount)));
+    @PutMapping("/{accountId}/withdraw")
+    public BigDecimal withdraw(@PathVariable long accountId, @RequestBody String amount) {
+        return accountDao.withdraw(accountId, BigDecimal.valueOf(Double.parseDouble(amount)));
     }
+
+
 
 }

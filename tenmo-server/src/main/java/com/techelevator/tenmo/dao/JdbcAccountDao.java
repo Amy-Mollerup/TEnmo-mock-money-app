@@ -1,6 +1,5 @@
 package com.techelevator.tenmo.dao;
 
-import com.techelevator.tenmo.exceptions.BalanceNotZeroException;
 import com.techelevator.tenmo.exceptions.TransferAmountZeroOrLessException;
 import com.techelevator.tenmo.exceptions.TransferAttemptExceedsAccountBalException;
 import com.techelevator.tenmo.exceptions.UserNotAuthorizedException;
@@ -47,29 +46,31 @@ public class JdbcAccountDao implements AccountDao {
     @Override
     //returns specific account based on userId of receiver that sender must enter
     //works in postman
-    public Account getAccountById(long userId) throws UsernameNotFoundException {
+    public Account find(long accountId) throws UsernameNotFoundException {
 
         Account account1 = null;
-        String sql = "SELECT * " + //not displaying balances for security purposes, will update balance in another method
+        String sql = "SELECT * " +
                 "FROM account " +
-                "WHERE user_id = ?;";
-        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, userId);
+                "WHERE account_id = ?;";
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, accountId);
         if (results.next()) {
             account1 = mapRowToAccount(results);
         }
         return account1;
     }
 
+
+
     //added getBalance method so we can specifically pull just the balance from the account id, need to authenticate the
     //id belongs to the user and the user is authorized
     //isFullyAuthenticated() && hasRole('user')
     @Override //retrieves current balance from account based on userId
-    public BigDecimal getBalance(long userId) {
+    public BigDecimal getBalance(long accountId) {
         BigDecimal balance = null;
         String sql = "SELECT balance FROM account " +
-                "WHERE  user_id = ?;";
+                "WHERE  account_id = ?;";
         try {
-            balance = jdbcTemplate.queryForObject(sql, BigDecimal.class, userId);
+            balance = jdbcTemplate.queryForObject(sql, BigDecimal.class, accountId);
         } catch (DataAccessException e) {
             System.out.println("Error accessing balance");
         }
@@ -77,23 +78,23 @@ public class JdbcAccountDao implements AccountDao {
     }
 
     @Override //adds to balance in account, returns updated balance
-    public BigDecimal deposit(long userId, BigDecimal amount)
+    public BigDecimal deposit(long accountId, BigDecimal amount)
     { // passing userId so method can be called in transfers, amount to update bal by
-        Account account = getAccountById(userId);
+        Account account = find(accountId);
         BigDecimal newBal = account.getBalance().add(amount);
         String sql = "UPDATE account SET balance = ? " +
-                "WHERE user_id = ?;";
+                "WHERE account_id = ?;";
         try {
-            jdbcTemplate.update(sql, newBal, userId);
+            jdbcTemplate.update(sql, newBal, accountId);
         } catch (UserNotAuthorizedException e) {
             System.out.println(e.getMessage());
         }
         try {
-            jdbcTemplate.update(sql, newBal, userId);
+            jdbcTemplate.update(sql, newBal, accountId);
         } catch (DataAccessException e) {
             System.out.println("Error accessing data");
         }
-        return getAccountById(userId).getBalance();
+        return find(accountId).getBalance();
 
     }
     /*@Override
@@ -113,14 +114,14 @@ public class JdbcAccountDao implements AccountDao {
 
     @Override //subtracts from balance in account, returns updated balance
     //BIG DECIMAL SUCKS - will throw numberformatexception if less than 0
-    public BigDecimal withdraw(long userId, BigDecimal amount) throws TransferAmountZeroOrLessException, TransferAttemptExceedsAccountBalException {
-        Account account = getAccountById(userId);
+    public BigDecimal withdraw(long accountId, BigDecimal amount) throws TransferAmountZeroOrLessException, TransferAttemptExceedsAccountBalException {
+        Account account = find(accountId);
         BigDecimal newBal = account.getBalance().subtract(amount);
         if(newBal.compareTo(ZERO) >= 0 && amount.compareTo(ZERO) > 0) {
             String sql = "UPDATE account SET balance = ? " +
-                    "WHERE user_id = ?;";
+                    "WHERE account_id = ?;";
             try {
-                jdbcTemplate.update(sql, newBal, userId);
+                jdbcTemplate.update(sql, newBal, accountId);
             } catch (DataAccessException e) {
                 System.out.println("Error accessing data");
             }
@@ -129,7 +130,7 @@ public class JdbcAccountDao implements AccountDao {
         } else if(newBal.compareTo(ZERO) < 0) {
             throw new TransferAttemptExceedsAccountBalException();
         }
-        return getAccountById(userId).getBalance();
+        return find(accountId).getBalance();
     }
 
 //    @Override //will delete account as long as balance is at zero - do we need to include delete user too since create user includes delete?

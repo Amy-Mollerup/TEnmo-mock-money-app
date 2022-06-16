@@ -16,16 +16,16 @@ public interface AccountDao {
 
     //updated: per trainer notes, do not need to account for more than one account (accounts should be 1-1)
     //may need to change exception
-    Account getAccountById(long userId) throws UsernameNotFoundException;
+    Account find(long userId) throws UsernameNotFoundException;
 
-    BigDecimal getBalance(long userId) throws UserNotAuthorizedException;
+    BigDecimal getBalance(long accountId) throws UserNotAuthorizedException;
     //user needs to be authorized to view balance
 
-    BigDecimal deposit(long userId, BigDecimal amount) throws UserNotAuthorizedException;
+    BigDecimal deposit(long accountId, BigDecimal amount) throws UserNotAuthorizedException;
 
 //    Account updateBalance(int balance, long id);
 
-    BigDecimal withdraw(long userId, BigDecimal amount) throws UserNotAuthorizedException, TransferAttemptExceedsAccountBalException;
+    BigDecimal withdraw(long accountId, BigDecimal amount) throws UserNotAuthorizedException, TransferAttemptExceedsAccountBalException;
     //can also have this throw balance cannot be 0 exception
 
  //   void delete(long accountId, long userId) throws UserNotAuthorizedException;

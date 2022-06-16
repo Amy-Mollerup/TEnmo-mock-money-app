@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,10 +51,17 @@ public class TransferController {
 
     @PostMapping("/send")
     //works in postman - does not return transfer id
-    public boolean createSendTransfer(@RequestBody Transfer transfer) {
+    public boolean createSendTransfer(@RequestBody String transfer) {
+        String[] paramList = transfer.split(",");
+        Long accountFrom = Long.valueOf(paramList[0]);
+        Long accountTo = Long.valueOf(paramList[1]);
+        BigDecimal amount = BigDecimal.valueOf(Double.parseDouble(paramList[2]));
+
         boolean success = false;
         try {
-            transferDao.createSendTransfer(transfer.getAccountFrom(), transfer.getAccountTo(), transfer.getAmount());
+            transferDao.createSendTransfer(accountFrom, accountTo, amount);
+            accountDao.withdraw(accountFrom, amount);
+            accountDao.deposit(accountTo, amount);
             success = true;
         } catch (RestClientResponseException e) {
             BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
@@ -67,10 +75,15 @@ public class TransferController {
 
     @PostMapping("/request")
     //works in postman, I think
-    public boolean createRequestTransfer(@RequestBody Transfer transfer) {
+    public boolean createRequestTransfer(@RequestBody String transfer) {
+        String[] paramList = transfer.split(",");
+        Long accountFrom = Long.valueOf(paramList[0]);
+        Long accountTo = Long.valueOf(paramList[1]);
+        BigDecimal amount = BigDecimal.valueOf(Double.parseDouble(paramList[2]));
+
         boolean success = false;
         try {
-            transferDao.createRequestTransfer(transfer.getAccountFrom(), transfer.getAccountTo(), transfer.getAmount());
+            transferDao.createRequestTransfer(accountFrom, accountTo, amount);
             success = true;
         } catch (RestClientResponseException e) {
             BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
@@ -81,15 +94,18 @@ public class TransferController {
         return success;
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/update/{transferId}")
     //client side -- add logic for transferStatusId input
     public boolean updateTransferStatus(@RequestBody int transferStatusId, @PathVariable Long transferId) throws Exception {
         boolean success = false;
         Transfer transfer = transferDao.findByTransferId(transferId);
+
         try {
-            accountDao.withdraw(transfer.getAccountFrom(), transfer.getAmount());
-            //if withdraw fails, we need to update the status to rejected
-            accountDao.deposit(transfer.getAccountTo(), transfer.getAmount());
+            if (transferStatusId == 2) {
+                accountDao.withdraw(transfer.getAccountFrom(), transfer.getAmount());
+                //if withdraw fails, we need to update the status to rejected
+                accountDao.deposit(transfer.getAccountTo(), transfer.getAmount());
+            }
             //if withdraw + deposit are both successful, update status accordingly
             transferDao.updateTransferStatus(transferId, transferStatusId);
             success = true;

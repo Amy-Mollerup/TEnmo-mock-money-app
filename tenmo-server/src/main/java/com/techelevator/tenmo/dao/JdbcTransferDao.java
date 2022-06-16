@@ -64,7 +64,7 @@ public class JdbcTransferDao implements TransferDao {
     public boolean createSendTransfer(Long accountFrom, Long accountTo, BigDecimal amount) {
         // TODO update balances to reflect the amount transferred
         String sql = "INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount) " +
-                "VALUES (1, 2, ?, ?, ?)";
+                "VALUES (2, 2, ?, ?, ?)";
         boolean success = false;
         try {
             jdbcTemplate.update(sql, accountFrom, accountTo, amount);
@@ -81,7 +81,7 @@ public class JdbcTransferDao implements TransferDao {
     public boolean createRequestTransfer(Long accountFrom, Long accountTo, BigDecimal amount) {
         // TODO update balances to reflect the amount transferred
         String sql = "INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount) " +
-                "VALUES (2, 1, ?, ?, ?)";
+                "VALUES (1, 1, ?, ?, ?)";
         boolean success = false;
         try {
             jdbcTemplate.update(sql, accountFrom, accountTo, amount);
@@ -100,10 +100,10 @@ public class JdbcTransferDao implements TransferDao {
                 "WHERE transfer_id = ?;";
         boolean success = false;
         try {
-            jdbcTemplate.queryForRowSet(sql, transferStatusId, transferId);
+            jdbcTemplate.update(sql, transferStatusId, transferId);
             success = true;
         } catch (DataAccessException e) {
-            System.out.println("Error accessing data");
+            System.out.println("Error accessing data 3");
         }
         return success;
     }
