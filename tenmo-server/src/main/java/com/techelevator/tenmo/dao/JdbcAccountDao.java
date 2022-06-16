@@ -93,7 +93,7 @@ public class JdbcAccountDao implements AccountDao {
         } catch (DataAccessException e) {
             System.out.println("Error accessing data");
         }
-        return account.getBalance();
+        return getAccountById(userId).getBalance();
 
     }
     /*@Override
@@ -129,7 +129,7 @@ public class JdbcAccountDao implements AccountDao {
         } else if(newBal.compareTo(ZERO) < 0) {
             throw new TransferAttemptExceedsAccountBalException();
         }
-        return account.getBalance();
+        return getAccountById(userId).getBalance();
     }
 
 //    @Override //will delete account as long as balance is at zero - do we need to include delete user too since create user includes delete?

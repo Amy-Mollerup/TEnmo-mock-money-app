@@ -28,6 +28,12 @@ public class TransferController {
         this.transferDao = transferDao;
     }
 
+    @GetMapping("/user/{id}")
+    //works in postman
+    public List<Transfer> getTransferByAccountId(@PathVariable Long id) {
+        return transferDao.findByAccountId(id);
+    }
+
     @GetMapping("/{id}")//get transfer by id
     //sort of works?? Only returns literally the transfer id
     public Transfer getTransferById(@PathVariable Long id) throws TransferIdDoesNotExistException {
@@ -77,7 +83,7 @@ public class TransferController {
 
     @PutMapping("/update/{id}")
     //client side -- add logic for transferStatusId input
-    public boolean updateTransferStatus(@RequestParam int transferStatusId, @PathVariable Long transferId) throws Exception {
+    public boolean updateTransferStatus(@RequestBody int transferStatusId, @PathVariable Long transferId) throws Exception {
         boolean success = false;
         Transfer transfer = transferDao.findByTransferId(transferId);
         try {

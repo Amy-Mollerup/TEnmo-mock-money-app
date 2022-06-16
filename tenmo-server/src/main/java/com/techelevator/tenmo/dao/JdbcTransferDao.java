@@ -39,7 +39,7 @@ public class JdbcTransferDao implements TransferDao {
     //we have a method in account that finds by userId
     public List<Transfer> findByAccountId(Long accountId) {
         List<Transfer> transfers = new ArrayList<>();
-        String sql = "SELECT * FROM transfer WHERE account_from ILIKE ? OR account_to ILIKE ?;";
+        String sql = "SELECT * FROM transfer WHERE account_from = ? OR account_to = ?;";
         SqlRowSet results = jdbcTemplate.queryForRowSet(sql, accountId, accountId);
         while(results.next()) {
             Transfer transfer = mapRowToTransfer(results);
@@ -64,47 +64,48 @@ public class JdbcTransferDao implements TransferDao {
     public boolean createSendTransfer(Long accountFrom, Long accountTo, BigDecimal amount) {
         // TODO update balances to reflect the amount transferred
         String sql = "INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount) " +
-                "VALUES (1, 2, ?, ?)";
+                "VALUES (1, 2, ?, ?, ?)";
+        boolean success = false;
         try {
-            jdbcTemplate.queryForRowSet(sql, accountFrom, accountTo);
+            jdbcTemplate.update(sql, accountFrom, accountTo, amount);
+            success = true;
         } catch (TransferAmountZeroOrLessException e) {
             System.out.println(e.getMessage());
-            return false;
         } catch (DataAccessException e) {
             System.out.println("Error accessing data");
-            return false;
         }
-        return true;
+        return success;
     }
 
     @Override //setting up our transfer requests from one user to another
     public boolean createRequestTransfer(Long accountFrom, Long accountTo, BigDecimal amount) {
         // TODO update balances to reflect the amount transferred
         String sql = "INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount) " +
-                "VALUES (2, 1, ?, ?)";
+                "VALUES (2, 1, ?, ?, ?)";
+        boolean success = false;
         try {
-            jdbcTemplate.queryForRowSet(sql, accountFrom, accountTo);
+            jdbcTemplate.update(sql, accountFrom, accountTo, amount);
+            success = true;
         } catch (TransferAmountZeroOrLessException e) {
             System.out.println(e.getMessage());
-            return false;
         } catch(DataAccessException e) {
             System.out.println("Error accessing data");
-            return false;
         }
-        return true;
+        return success;
     }
 
     @Override
     public boolean updateTransferStatus(Long transferId, int transferStatusId) {
         String sql = "UPDATE transfer SET transfer_status_id = ?" +
                 "WHERE transfer_id = ?;";
+        boolean success = false;
         try {
             jdbcTemplate.queryForRowSet(sql, transferStatusId, transferId);
+            success = true;
         } catch (DataAccessException e) {
             System.out.println("Error accessing data");
-            return false;
         }
-        return true;
+        return success;
     }
 
     @Override //retrieves transfer status description
@@ -129,8 +130,10 @@ public class JdbcTransferDao implements TransferDao {
         Transfer transfer = new Transfer();
         transfer.setId(results.getLong("transfer_id"));
         transfer.setTransferTypeId(results.getInt("transfer_type_id"));
+        transfer.setTransferStatusId(results.getInt("transfer_status_id"));
         transfer.setAccountFrom(results.getLong("account_from"));
         transfer.setAccountTo(results.getLong("account_to"));
+        transfer.setAmount(results.getBigDecimal("amount"));
         return transfer;
     }
 
