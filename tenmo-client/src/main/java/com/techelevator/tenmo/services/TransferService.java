@@ -76,7 +76,7 @@ import java.util.List;
             HttpEntity entity = makeEntity(authenticatedUser);
             Transfer[] allTransfers = null;
             try {
-                allTransfers = restTemplate.exchange(baseUrl + accountId, HttpMethod.GET, entity, Transfer[].class).getBody();
+                allTransfers = restTemplate.exchange(baseUrl + "/user/" + accountId, HttpMethod.GET, entity, Transfer[].class).getBody();
             } catch (RestClientResponseException e) {
                 System.out.println("Unable to display transfers. Error code: " + e.getRawStatusCode());
                 BasicLogger.log(e.getMessage());

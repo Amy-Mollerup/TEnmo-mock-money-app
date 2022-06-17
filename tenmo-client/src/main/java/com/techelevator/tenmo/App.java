@@ -99,7 +99,7 @@ public class App {
 	}
 
 	private void viewPendingRequests() {
-		// TODO Auto-generated method stub
+        consoleService.printPendingRequests(currentUser);
 		
 	}
 

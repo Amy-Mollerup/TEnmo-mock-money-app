@@ -1,10 +1,7 @@
 package com.techelevator.tenmo.services;
 
 
-import com.techelevator.tenmo.model.Account;
-import com.techelevator.tenmo.model.AuthenticatedUser;
-import com.techelevator.tenmo.model.User;
-import com.techelevator.tenmo.model.UserCredentials;
+import com.techelevator.tenmo.model.*;
 
 import java.math.BigDecimal;
 import java.util.Scanner;
@@ -126,6 +123,22 @@ public class ConsoleService {
             System.out.printf(columnFormat, "ID", field2);
         }
         System.out.println(dashes);
+    }
+
+    public void printPendingRequests(AuthenticatedUser authenticatedUser) {
+        //just need to clean up aesthetic formatting
+        printHeaders("Pending Transfers", "To", true );
+        Account accountByUserId = accountService.getAccountByUserId(authenticatedUser, authenticatedUser.getUser().getId());
+        long accountId = accountByUserId.getAccountId();
+        Transfer[] transfers = transferService.getAllTransfersByAccountId(authenticatedUser, accountId);
+        for(Transfer t : transfers) {
+            if(t.getTransferStatusId() != 1) {
+                System.out.println("No pending transfers.");
+                break;
+            } else {
+                System.out.println("Current pending transfers: " + t.getTransferStatusId() + t.getAccountFrom() + t.getAccountTo() + t.getAmount());
+            }
+        }
     }
 
 
