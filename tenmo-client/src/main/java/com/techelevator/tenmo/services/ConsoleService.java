@@ -2,6 +2,7 @@ package com.techelevator.tenmo.services;
 
 
 import com.techelevator.tenmo.model.AuthenticatedUser;
+import com.techelevator.tenmo.model.User;
 import com.techelevator.tenmo.model.UserCredentials;
 
 import java.math.BigDecimal;
@@ -9,7 +10,14 @@ import java.util.Scanner;
 
 public class ConsoleService {
 
+    private static final String API_BASE_URL = "http://localhost:8080/";
+
     private final Scanner scanner = new Scanner(System.in);
+    private final AccountService accountService = new AccountService(API_BASE_URL);
+    private final UserService userService = new UserService(API_BASE_URL);
+    private final TransferService transferService = new TransferService(API_BASE_URL);
+    private final String dashes = String.format("%043d", 0).replace("0", "-");
+    private final String columnFormat = "%-12s%-23s\n";
 
     public int promptForMenuSelection(String prompt) {
         int menuSelection;
@@ -89,7 +97,36 @@ public class ConsoleService {
         System.out.println("An error occurred. Check the log for details.");
     }
 
-//    public void printCurrentBalance(BigDecimal balance) {
-//        System.out.println("Your current account balance is: " + );
-//    }
+    public void printCurrentBalance(AuthenticatedUser user) {
+        BigDecimal balance = accountService.getBalance(user);
+        if (balance != null) {
+            System.out.println("Your current account balance is: " + balance);
+        } else {
+            printErrorMessage();
+        }
+    }
+
+    public void printUsers(AuthenticatedUser authenticatedUser) {
+        printHeaders("Users", "Name", false);
+        User[] allUsers = userService.getAllUsers(authenticatedUser);
+        for(User user : allUsers) {
+            System.out.printf(columnFormat, user.getId(), user.getUsername());
+        }
+        System.out.println("---------");
+    }
+
+    public void printHeaders(String menuTitle, String field2, boolean amount) {
+        System.out.println(dashes);
+        System.out.println(menuTitle);
+        if(amount) {
+            String newFormat = columnFormat + "%s";
+            System.out.printf(newFormat, "ID", field2, "amount");
+        } else {
+            System.out.printf(columnFormat, "ID", field2);
+        }
+        System.out.println(dashes);
+    }
+
+
+
 }

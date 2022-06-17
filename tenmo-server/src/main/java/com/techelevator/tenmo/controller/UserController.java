@@ -25,7 +25,7 @@ public class UserController {
         return dao.findIdByUsername(username);
     }
 
-    @GetMapping("/allusers")
+    @GetMapping()
     //works in postman
     public List<User> list() {
         return dao.findAll();

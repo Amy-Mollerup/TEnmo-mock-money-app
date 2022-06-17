@@ -89,8 +89,7 @@ public class App {
     }
 
 	private void viewCurrentBalance() {
-//        BigDecimal accountBalance = accountService.getBalanceById(currentUser.getUser().getId());
-//		consoleService.printCurrentBalance(accountBalance);
+        consoleService.printCurrentBalance(currentUser);
 	}
 
 	private void viewTransferHistory() {
@@ -104,8 +103,10 @@ public class App {
 	}
 
 	private void sendBucks() {
-		// TODO Auto-generated method stub
-		
+        consoleService.printUsers(currentUser);
+        Long userId = (long) consoleService.promptForInt("Enter ID of user you are sending to (0 to cancel): ");
+        BigDecimal amount = consoleService.promptForBigDecimal("Enter amount: ");
+        transferService.createSendTransfer(currentUser, userId, amount);
 	}
 
 	private void requestBucks() {

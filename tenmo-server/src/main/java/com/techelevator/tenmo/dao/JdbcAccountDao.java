@@ -46,31 +46,35 @@ public class JdbcAccountDao implements AccountDao {
     @Override
     //returns specific account based on userId of receiver that sender must enter
     //works in postman
-    public Account find(long accountId) throws UsernameNotFoundException {
+    public Account find(long userId) throws UsernameNotFoundException {
 
         Account account1 = null;
         String sql = "SELECT * " +
                 "FROM account " +
-                "WHERE account_id = ?;";
-        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, accountId);
+                "WHERE user_id = ?;";
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, userId);
         if (results.next()) {
             account1 = mapRowToAccount(results);
         }
         return account1;
     }
 
-
+//    @Override
+//    public Long findUserIdByAccountId(Long accountId) {
+//        String sql = "SELECT user_id FROM account WHERE account_id = ?";
+//        return jdbcTemplate.queryForObject(sql, Long.class, accountId);
+//    }
 
     //added getBalance method so we can specifically pull just the balance from the account id, need to authenticate the
     //id belongs to the user and the user is authorized
     //isFullyAuthenticated() && hasRole('user')
     @Override //retrieves current balance from account based on userId
-    public BigDecimal getBalance(long accountId) {
+    public BigDecimal getBalance(long userId) {
         BigDecimal balance = null;
         String sql = "SELECT balance FROM account " +
-                "WHERE  account_id = ?;";
+                "WHERE user_id = ?;";
         try {
-            balance = jdbcTemplate.queryForObject(sql, BigDecimal.class, accountId);
+            balance = jdbcTemplate.queryForObject(sql, BigDecimal.class, userId);
         } catch (DataAccessException e) {
             System.out.println("Error accessing balance");
         }

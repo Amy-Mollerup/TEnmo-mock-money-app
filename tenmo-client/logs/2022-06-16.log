@@ -1,0 +1,10 @@
+2022-06-16T15:44:04.8195149 I/O error on POST request for "http://localhost:8080/login": Connection refused: connect; nested exception is java.net.ConnectException: Connection refused: connect
+2022-06-16T15:44:14.3858175 I/O error on POST request for "http://localhost:8080/register": Connection refused: connect; nested exception is java.net.ConnectException: Connection refused: connect
+2022-06-16T15:44:20.2032997 I/O error on POST request for "http://localhost:8080/login": Connection refused: connect; nested exception is java.net.ConnectException: Connection refused: connect
+2022-06-16T15:45:01.4937648 404 : 
+2022-06-16T15:49:14.1985543 404 : [{"timestamp":"2022-06-16T21:49:14.184+00:00","status":404,"error":"Not Found","message":"No message available","path":"/balance/1006"}]
+2022-06-16T15:53:04.9335466 404 : [{"timestamp":"2022-06-16T21:53:04.916+00:00","status":404,"error":"Not Found","message":"No message available","path":"/balance/1006"}]
+2022-06-16T15:56:08.9255673 401 : [no body]
+2022-06-16T15:56:13.4017522 Cannot invoke "com.techelevator.tenmo.model.Account.getBalance()" because the return value of "org.springframework.http.ResponseEntity.getBody()" is null
+2022-06-16T17:49:02.5283006 500 : 
+2022-06-16T18:00:30.6957996 500 : 

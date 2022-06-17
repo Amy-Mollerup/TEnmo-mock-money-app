@@ -11,23 +11,28 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
+import java.math.BigDecimal;
 import java.util.List;
 
     public class TransferService {
 
-        private RestTemplate restTemplate;
+        private RestTemplate restTemplate = new RestTemplate();
         private final String baseUrl;
 
         public TransferService(String url) {
-            this.baseUrl = url;
+            this.baseUrl = url + "transfer/";
 
         }
 
-        public void createSendTransfer(AuthenticatedUser authenticatedUser) {
+        public void createSendTransfer(AuthenticatedUser authenticatedUser, Long toUserId, BigDecimal amount) {
             //need to work more on this - not sure if it is set up correctly
-            HttpEntity entity = makeEntity(authenticatedUser);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(authenticatedUser.getToken());
+            // TODO fix withdraw and deposit methods in AccountDao so they use the correct ID
+            String string = "2001,2004,50";
+            HttpEntity<String> entity = new HttpEntity(string,headers);
             try {
-                restTemplate.exchange(baseUrl + "/transfer/send", HttpMethod.POST, entity, Transfer.class);
+                restTemplate.exchange(baseUrl + "send", HttpMethod.POST, entity, Transfer.class);
             } catch (RestClientResponseException e) {
                 System.out.println("Unable to create transfer. Error code: " + e.getRawStatusCode());
                 BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
@@ -36,10 +41,11 @@ import java.util.List;
                 System.out.println(e.getMessage());
             }
         }
+
         public void updateTransferStatus(AuthenticatedUser authenticatedUser, Long transferId) {
             HttpEntity entity = makeEntity(authenticatedUser);
             try {
-                restTemplate.exchange(baseUrl + "/transfer/" + transferId, HttpMethod.POST, entity, Transfer.class);
+                restTemplate.exchange(baseUrl + transferId, HttpMethod.POST, entity, Transfer.class);
             } catch (RestClientResponseException e) {
                 System.out.println("Unable to update transfer status. Error code: " + e.getRawStatusCode());
                 BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
@@ -52,7 +58,7 @@ import java.util.List;
         public void requestSendTransfer(AuthenticatedUser authenticatedUser) {
             HttpEntity entity = makeEntity(authenticatedUser);
             try {
-                restTemplate.exchange(baseUrl + "/transfer/request", HttpMethod.POST, entity, Transfer.class);
+                restTemplate.exchange(baseUrl + "request", HttpMethod.POST, entity, Transfer.class);
             } catch (RestClientResponseException e) {
                 System.out.println("Unable to complete request. Error code: " + e.getRawStatusCode());
                 BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
@@ -66,7 +72,7 @@ import java.util.List;
             HttpEntity entity = makeEntity(authenticatedUser);
             Transfer[] allTransfers = null;
             try {
-                allTransfers = restTemplate.exchange(baseUrl + "/transfer/" + accountId, HttpMethod.GET, entity, Transfer[].class).getBody();
+                allTransfers = restTemplate.exchange(baseUrl + accountId, HttpMethod.GET, entity, Transfer[].class).getBody();
             } catch (RestClientResponseException e) {
                 System.out.println("Unable to display transfers. Error code: " + e.getRawStatusCode());
                 BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
@@ -81,7 +87,7 @@ import java.util.List;
             HttpEntity entity = makeEntity(authenticatedUser);
             Transfer transfer = null;
             try {
-                transfer = restTemplate.exchange(baseUrl + "/transfer/" + transferId, HttpMethod.GET, entity, Transfer.class).getBody();
+                transfer = restTemplate.exchange(baseUrl + transferId, HttpMethod.GET, entity, Transfer.class).getBody();
             } catch (RestClientResponseException e) {
                 System.out.println("Unable to retrieve transfer. Error code: " + e.getRawStatusCode());
                 BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
@@ -97,7 +103,7 @@ import java.util.List;
             HttpEntity entity = makeEntity(authenticatedUser); //can this be set up to just return literally the transfer status text?
             Transfer[] transfersByStatus = null;
             try {
-                transfersByStatus = restTemplate.exchange(baseUrl + "/transfer/" + transferStatusId, HttpMethod.GET, entity, Transfer[].class).getBody();
+                transfersByStatus = restTemplate.exchange(baseUrl + transferStatusId, HttpMethod.GET, entity, Transfer[].class).getBody();
             } catch (RestClientResponseException e) {
                 System.out.println("Unable to display transfers. Error code: " + e.getRawStatusCode());
                 BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
@@ -113,7 +119,7 @@ import java.util.List;
             HttpEntity entity = makeEntity(authenticatedUser);
             Transfer transfer = null;
             try {
-                transfer = restTemplate.exchange(baseUrl + "/transfer/" + transferType, HttpMethod.GET, entity, Transfer.class).getBody();
+                transfer = restTemplate.exchange(baseUrl + transferType, HttpMethod.GET, entity, Transfer.class).getBody();
             } catch (RestClientResponseException e) {
             System.out.println("Unable to display transfers. Error code: " + e.getRawStatusCode());
             BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());

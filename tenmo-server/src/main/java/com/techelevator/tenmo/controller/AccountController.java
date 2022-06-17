@@ -24,9 +24,9 @@ public class AccountController {
         return accountDao.list();
     }
 
-    @GetMapping("/{accountId}")
-    public Account getAccountById(@PathVariable long accountId) {
-        return accountDao.find(accountId);
+    @GetMapping("/{userId}")
+    public Account getAccountByUserId(@PathVariable long userId) {
+        return accountDao.find(userId);
     }
 
     @GetMapping("/{userId}/balance")

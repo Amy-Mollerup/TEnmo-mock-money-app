@@ -20,21 +20,18 @@ public class AccountService {
     private final String baseUrl;
     private final RestTemplate restTemplate = new RestTemplate();
 
-    public AccountService(String url) { this.baseUrl = url; }
+    public AccountService(String url) { this.baseUrl = url + "account/"; }
 
-    public BigDecimal getBalanceByUserId(AuthenticatedUser authenticatedUser, Long userId) { //Throw user not auth exception?
+    public BigDecimal getBalance(AuthenticatedUser authenticatedUser) { //Throw user not auth exception?
         HttpEntity entity = makeEntity(authenticatedUser);
+        Long userId = authenticatedUser.getUser().getId();
         BigDecimal balance = null;
         try {
-            balance = restTemplate.exchange(baseUrl + "/balance/" + userId,
+            balance = restTemplate.exchange(baseUrl + userId + "/balance",
                     HttpMethod.GET, entity,
-                    Account.class).getBody().getBalance();
-        } catch (RestClientResponseException e) {
-            BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
-            System.out.println("Unable to access balance. Error code: " + e.getRawStatusCode());
-        } catch (ResourceAccessException e) {
+                    BigDecimal.class).getBody();
+        } catch (RestClientResponseException | ResourceAccessException e) {
             BasicLogger.log(e.getMessage());
-            System.out.println(e.getMessage());
         }
         return balance;
     }
@@ -42,14 +39,10 @@ public class AccountService {
         HttpEntity entity = makeEntity(authenticatedUser);
         Account account = null;
         try {
-            account = restTemplate.exchange(baseUrl +"/" + userId, HttpMethod.GET, entity,
+            account = restTemplate.exchange(baseUrl + userId, HttpMethod.GET, entity,
                     Account.class).getBody();
-        } catch (RestClientResponseException e) {
-            System.out.println("Unable to locate account. Error code: " + e.getRawStatusCode());
-            BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
-        } catch(ResourceAccessException e) {
+        }  catch (RestClientResponseException | ResourceAccessException e) {
             BasicLogger.log(e.getMessage());
-            System.out.println(e.getMessage());
         }
         return account;
 

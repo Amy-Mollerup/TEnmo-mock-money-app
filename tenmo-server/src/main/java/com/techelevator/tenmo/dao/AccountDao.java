@@ -18,6 +18,8 @@ public interface AccountDao {
     //may need to change exception
     Account find(long userId) throws UsernameNotFoundException;
 
+    //Long findUserIdByAccountId(Long accountId);
+
     BigDecimal getBalance(long accountId) throws UserNotAuthorizedException;
     //user needs to be authorized to view balance
 

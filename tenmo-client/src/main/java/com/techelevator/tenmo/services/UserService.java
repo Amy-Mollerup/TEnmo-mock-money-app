@@ -14,18 +14,19 @@ import org.springframework.web.client.RestTemplate;
 
 public class UserService {
 
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate = new RestTemplate();
     private final String baseUrl;
 
+
     public UserService(String url) {
-        this.baseUrl = url;
+        this.baseUrl = url + "/user";
     }
 
     public User[] getAllUsers(AuthenticatedUser authenticatedUser) {
         HttpEntity entity = makeEntity(authenticatedUser);
         User[] allUsers = null;
         try {
-            allUsers = restTemplate.exchange(baseUrl + "/allusers", HttpMethod.GET, entity, User[].class).getBody();
+            allUsers = restTemplate.exchange(baseUrl, HttpMethod.GET, entity, User[].class).getBody();
         } catch (RestClientResponseException e) {
             System.out.println("Unable to display users. Error code: " + e.getRawStatusCode());
             BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
