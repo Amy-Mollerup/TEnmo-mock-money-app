@@ -7,10 +7,12 @@ import com.techelevator.util.BasicLogger;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
+import javax.swing.text.html.parser.Entity;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -24,18 +26,20 @@ import java.util.List;
 
         }
 
-        public void createSendTransfer(AuthenticatedUser authenticatedUser, Long toUserId, BigDecimal amount) {
+        public void createSendTransfer(AuthenticatedUser authenticatedUser, Long fromAccountId, Long toAccountId, BigDecimal amount) {
             //need to work more on this - not sure if it is set up correctly
-            HttpHeaders headers = new HttpHeaders();
-            headers.setBearerAuth(authenticatedUser.getToken());
-            // TODO fix withdraw and deposit methods in AccountDao so they use the correct ID
-            String string = "2001,2004,50";
-            HttpEntity<String> entity = new HttpEntity(string,headers);
+            Transfer transfer = new Transfer();
+            transfer.setTransferTypeId(2);
+            transfer.setTransferStatusId(2);
+            transfer.setAccountFrom(fromAccountId);
+            transfer.setAccountTo(toAccountId);
+            transfer.setAmount(amount);
+            HttpEntity<Transfer> entity = makeTransferEntity(authenticatedUser, transfer);
             try {
-                restTemplate.exchange(baseUrl + "send", HttpMethod.POST, entity, Transfer.class);
+                restTemplate.exchange(baseUrl, HttpMethod.POST, entity, Boolean.class);
             } catch (RestClientResponseException e) {
                 System.out.println("Unable to create transfer. Error code: " + e.getRawStatusCode());
-                BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
+                BasicLogger.log(e.getMessage());
             } catch(ResourceAccessException e) {
                 BasicLogger.log(e.getMessage());
                 System.out.println(e.getMessage());
@@ -61,7 +65,7 @@ import java.util.List;
                 restTemplate.exchange(baseUrl + "request", HttpMethod.POST, entity, Transfer.class);
             } catch (RestClientResponseException e) {
                 System.out.println("Unable to complete request. Error code: " + e.getRawStatusCode());
-                BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
+                BasicLogger.log(e.getMessage());
             } catch(ResourceAccessException e) {
                 BasicLogger.log(e.getMessage());
                 System.out.println(e.getMessage());
@@ -75,7 +79,7 @@ import java.util.List;
                 allTransfers = restTemplate.exchange(baseUrl + accountId, HttpMethod.GET, entity, Transfer[].class).getBody();
             } catch (RestClientResponseException e) {
                 System.out.println("Unable to display transfers. Error code: " + e.getRawStatusCode());
-                BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
+                BasicLogger.log(e.getMessage());
             } catch(ResourceAccessException e) {
                 BasicLogger.log(e.getMessage());
                 System.out.println(e.getMessage());
@@ -135,6 +139,13 @@ import java.util.List;
         headers.setBearerAuth(authenticatedUser.getToken());
         HttpEntity entity = new HttpEntity(headers);
         return entity;
+    }
+
+    private HttpEntity<Transfer> makeTransferEntity(AuthenticatedUser user, Transfer transfer) {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setBearerAuth(user.getToken());
+            return new HttpEntity<>(transfer, headers);
     }
 }
 

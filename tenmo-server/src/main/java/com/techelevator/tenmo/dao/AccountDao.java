@@ -18,6 +18,9 @@ public interface AccountDao {
     //may need to change exception
     Account find(long userId) throws UsernameNotFoundException;
 
+    // Finds full account information by Account ID
+    Account findById(long accountId);
+
     //Long findUserIdByAccountId(Long accountId);
 
     BigDecimal getBalance(long accountId) throws UserNotAuthorizedException;

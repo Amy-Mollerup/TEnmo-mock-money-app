@@ -29,9 +29,9 @@ public class AccountController {
         return accountDao.find(userId);
     }
 
-    @GetMapping("/{userId}/balance")
-    public BigDecimal getBalance(@PathVariable long userId) {
-        return accountDao.getBalance(userId);
+    @GetMapping("/{accountId}/balance")
+    public BigDecimal getBalance(@PathVariable long accountId) {
+        return accountDao.getBalance(accountId);
     }
 
     @PutMapping("/{accountId}/deposit")

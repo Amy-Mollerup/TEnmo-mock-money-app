@@ -59,6 +59,20 @@ public class JdbcAccountDao implements AccountDao {
         return account1;
     }
 
+    @Override
+    public Account findById(long accountId) {
+
+        Account account = null;
+        String sql = "SELECT * " +
+                "FROM account " +
+                "WHERE account_id = ?;";
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, accountId);
+        if (results.next()) {
+            account = mapRowToAccount(results);
+        }
+        return account;
+    }
+
 //    @Override
 //    public Long findUserIdByAccountId(Long accountId) {
 //        String sql = "SELECT user_id FROM account WHERE account_id = ?";
@@ -69,12 +83,12 @@ public class JdbcAccountDao implements AccountDao {
     //id belongs to the user and the user is authorized
     //isFullyAuthenticated() && hasRole('user')
     @Override //retrieves current balance from account based on userId
-    public BigDecimal getBalance(long userId) {
+    public BigDecimal getBalance(long accountId) {
         BigDecimal balance = null;
         String sql = "SELECT balance FROM account " +
-                "WHERE user_id = ?;";
+                "WHERE account_id = ?;";
         try {
-            balance = jdbcTemplate.queryForObject(sql, BigDecimal.class, userId);
+            balance = jdbcTemplate.queryForObject(sql, BigDecimal.class, accountId);
         } catch (DataAccessException e) {
             System.out.println("Error accessing balance");
         }
@@ -84,8 +98,7 @@ public class JdbcAccountDao implements AccountDao {
     @Override //adds to balance in account, returns updated balance
     public BigDecimal deposit(long accountId, BigDecimal amount)
     { // passing userId so method can be called in transfers, amount to update bal by
-        Account account = find(accountId);
-        BigDecimal newBal = account.getBalance().add(amount);
+        BigDecimal newBal = getBalance(accountId).add(amount);
         String sql = "UPDATE account SET balance = ? " +
                 "WHERE account_id = ?;";
         try {
@@ -93,12 +106,7 @@ public class JdbcAccountDao implements AccountDao {
         } catch (UserNotAuthorizedException e) {
             System.out.println(e.getMessage());
         }
-        try {
-            jdbcTemplate.update(sql, newBal, accountId);
-        } catch (DataAccessException e) {
-            System.out.println("Error accessing data");
-        }
-        return find(accountId).getBalance();
+        return newBal;
 
     }
     /*@Override
@@ -119,8 +127,7 @@ public class JdbcAccountDao implements AccountDao {
     @Override //subtracts from balance in account, returns updated balance
     //BIG DECIMAL SUCKS - will throw numberformatexception if less than 0
     public BigDecimal withdraw(long accountId, BigDecimal amount) throws TransferAmountZeroOrLessException, TransferAttemptExceedsAccountBalException {
-        Account account = find(accountId);
-        BigDecimal newBal = account.getBalance().subtract(amount);
+        BigDecimal newBal = getBalance(accountId).subtract(amount);
         if(newBal.compareTo(ZERO) >= 0 && amount.compareTo(ZERO) > 0) {
             String sql = "UPDATE account SET balance = ? " +
                     "WHERE account_id = ?;";
@@ -134,7 +141,7 @@ public class JdbcAccountDao implements AccountDao {
         } else if(newBal.compareTo(ZERO) < 0) {
             throw new TransferAttemptExceedsAccountBalException();
         }
-        return find(accountId).getBalance();
+        return newBal;
     }
 
 //    @Override //will delete account as long as balance is at zero - do we need to include delete user too since create user includes delete?

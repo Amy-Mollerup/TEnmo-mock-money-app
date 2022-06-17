@@ -13,7 +13,7 @@ public interface TransferDao {
 
     Transfer findByTransferId(Long id) throws Exception;
 
-    boolean createSendTransfer(Long accountFrom, Long accountTo, BigDecimal amount);
+    boolean createTransfer(Transfer transfer);
 
     boolean createRequestTransfer(Long accountFrom, Long accountTo, BigDecimal amount);
 

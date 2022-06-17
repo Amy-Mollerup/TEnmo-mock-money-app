@@ -12,7 +12,6 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -49,17 +48,16 @@ public class TransferController {
         return transferByID;
     }
 
-    @PostMapping("/send")
+    @PostMapping()
     //works in postman - does not return transfer id
-    public boolean createSendTransfer(@RequestBody String transfer) {
-        String[] paramList = transfer.split(",");
-        Long accountFrom = Long.valueOf(paramList[0]);
-        Long accountTo = Long.valueOf(paramList[1]);
-        BigDecimal amount = BigDecimal.valueOf(Double.parseDouble(paramList[2]));
+    public boolean createTransfer(@RequestBody Transfer transfer) {
+        Long accountFrom = transfer.getAccountFrom();
+        Long accountTo = transfer.getAccountTo();
+        BigDecimal amount = transfer.getAmount();
 
         boolean success = false;
         try {
-            transferDao.createSendTransfer(accountFrom, accountTo, amount);
+            transferDao.createTransfer(transfer);
             accountDao.withdraw(accountFrom, amount);
             accountDao.deposit(accountTo, amount);
             success = true;
@@ -71,7 +69,7 @@ public class TransferController {
         }
         return success;
     }
-
+/*
 
     @PostMapping("/request")
     //works in postman, I think
@@ -92,7 +90,7 @@ public class TransferController {
             BasicLogger.log(e.getMessage());
         }
         return success;
-    }
+    }*/
 
     @PutMapping("/update/{transferId}")
     //client side -- add logic for transferStatusId input

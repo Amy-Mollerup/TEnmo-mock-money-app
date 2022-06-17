@@ -9,7 +9,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 
-import javax.xml.crypto.Data;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,13 +60,14 @@ public class JdbcTransferDao implements TransferDao {
 
 
     @Override //sending actual transfer to user
-    public boolean createSendTransfer(Long accountFrom, Long accountTo, BigDecimal amount) {
+    public boolean createTransfer(Transfer transfer) {
         // TODO update balances to reflect the amount transferred
         String sql = "INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount) " +
-                "VALUES (2, 2, ?, ?, ?)";
+                "VALUES (?, ?, ?, ?, ?)";
         boolean success = false;
         try {
-            jdbcTemplate.update(sql, accountFrom, accountTo, amount);
+            jdbcTemplate.update(sql, transfer.getTransferTypeId(), transfer.getTransferStatusId(),
+                    transfer.getAccountFrom(), transfer.getAccountTo(), transfer.getAmount());
             success = true;
         } catch (TransferAmountZeroOrLessException e) {
             System.out.println(e.getMessage());
@@ -128,7 +128,7 @@ public class JdbcTransferDao implements TransferDao {
 
     private Transfer mapRowToTransfer(SqlRowSet results) {
         Transfer transfer = new Transfer();
-        transfer.setId(results.getLong("transfer_id"));
+        transfer.setTransferId(results.getLong("transfer_id"));
         transfer.setTransferTypeId(results.getInt("transfer_type_id"));
         transfer.setTransferStatusId(results.getInt("transfer_status_id"));
         transfer.setAccountFrom(results.getLong("account_from"));

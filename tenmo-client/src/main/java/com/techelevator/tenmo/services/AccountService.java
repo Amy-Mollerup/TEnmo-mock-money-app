@@ -23,11 +23,12 @@ public class AccountService {
     public AccountService(String url) { this.baseUrl = url + "account/"; }
 
     public BigDecimal getBalance(AuthenticatedUser authenticatedUser) { //Throw user not auth exception?
+        Account account = getAccountByUserId(authenticatedUser, authenticatedUser.getUser().getId());
         HttpEntity entity = makeEntity(authenticatedUser);
-        Long userId = authenticatedUser.getUser().getId();
+        Long accountId = account.getAccountId();
         BigDecimal balance = null;
         try {
-            balance = restTemplate.exchange(baseUrl + userId + "/balance",
+            balance = restTemplate.exchange(baseUrl + accountId + "/balance",
                     HttpMethod.GET, entity,
                     BigDecimal.class).getBody();
         } catch (RestClientResponseException | ResourceAccessException e) {

@@ -1,5 +1,6 @@
 package com.techelevator.tenmo;
 
+import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.AuthenticatedUser;
 import com.techelevator.tenmo.model.UserCredentials;
 import com.techelevator.tenmo.services.*;
@@ -104,9 +105,13 @@ public class App {
 
 	private void sendBucks() {
         consoleService.printUsers(currentUser);
-        Long userId = (long) consoleService.promptForInt("Enter ID of user you are sending to (0 to cancel): ");
+
+        Long toUserId = (long) consoleService.promptForInt("Enter ID of user you are sending to (0 to cancel): ");
+        Long fromAccountId = accountService.getAccountByUserId(currentUser, currentUser.getUser().getId()).getAccountId();
+        Long toAccountId = accountService.getAccountByUserId(currentUser, toUserId).getAccountId();
         BigDecimal amount = consoleService.promptForBigDecimal("Enter amount: ");
-        transferService.createSendTransfer(currentUser, userId, amount);
+
+        transferService.createSendTransfer(currentUser, fromAccountId, toAccountId, amount);
 	}
 
 	private void requestBucks() {
