@@ -15,7 +15,7 @@ public class ConsoleService {
     private final UserService userService = new UserService(API_BASE_URL);
     private final TransferService transferService = new TransferService(API_BASE_URL);
     private final String dashes = String.format("%043d", 0).replace("0", "-");
-    private final String columnFormat = "%-12s%-23s\n";
+    private final String columnFormat = "%-12s%-23s";
 
     public int promptForMenuSelection(String prompt) {
         int menuSelection;
@@ -108,7 +108,7 @@ public class ConsoleService {
         printHeaders("Users", "Name", false);
         User[] allUsers = userService.getAllUsers(authenticatedUser);
         for(User user : allUsers) {
-            System.out.printf(columnFormat, user.getId(), user.getUsername());
+            System.out.printf(columnFormat + "\n", user.getId(), user.getUsername());
         }
         System.out.println("---------");
     }
@@ -117,10 +117,10 @@ public class ConsoleService {
         System.out.println(dashes);
         System.out.println(menuTitle);
         if(amount) {
-            String newFormat = columnFormat + "%s";
+            String newFormat = columnFormat + "%s" + "\n";
             System.out.printf(newFormat, "ID", field2, "amount");
         } else {
-            System.out.printf(columnFormat, "ID", field2);
+            System.out.printf(columnFormat + "\n", "ID", field2);
         }
         System.out.println(dashes);
     }
@@ -136,8 +136,19 @@ public class ConsoleService {
                 System.out.println("No pending transfers.");
                 break;
             } else {
-                System.out.println("Current pending transfers: " + t.getTransferStatusId() + t.getAccountFrom() + t.getAccountTo() + t.getAmount());
+                System.out.printf(columnFormat + "%s" + "\n", t.getTransferStatusId(), t.getAccountTo(), t.getAmount().toString());
             }
+        }
+    }
+
+    public void printTransferHistory(AuthenticatedUser authenticatedUser) {
+        //amount needs to be corrected - pulling wrong data
+        printHeaders("Transfer History", "From/To", true);
+        Account accountByUserId = accountService.getAccountByUserId(authenticatedUser, authenticatedUser.getUser().getId());
+        long accountId = accountByUserId.getAccountId();
+        Transfer[] transfers = transferService.getAllTransfersByAccountId(authenticatedUser, accountId);
+        for(Transfer t : transfers) {
+            System.out.printf(columnFormat + "%s" + "\n", t.getTransferId(), t.getAccountFrom(), t.getAccountTo(), t.getAmount().toString());
         }
     }
 

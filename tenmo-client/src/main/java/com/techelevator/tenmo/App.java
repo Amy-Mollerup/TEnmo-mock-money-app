@@ -94,12 +94,14 @@ public class App {
 	}
 
 	private void viewTransferHistory() {
-		// TODO Auto-generated method stub
+		consoleService.printTransferHistory(currentUser);
+        //add prompt to view details based off ID
 		
 	}
 
 	private void viewPendingRequests() {
         consoleService.printPendingRequests(currentUser);
+        //add approve and reject capabilities
 		
 	}
 
