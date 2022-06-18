@@ -34,12 +34,8 @@ public class TransferService {
             HttpEntity<Transfer> entity = makeTransferEntity(authenticatedUser, transfer);
             try {
                 restTemplate.exchange(baseUrl, HttpMethod.POST, entity, Boolean.class);
-            } catch (RestClientResponseException e) {
-                System.out.println("Unable to create transfer. Error code: " + e.getRawStatusCode());
+            } catch (RestClientResponseException | ResourceAccessException e) {;
                 BasicLogger.log(e.getMessage());
-            } catch(ResourceAccessException e) {
-                BasicLogger.log(e.getMessage());
-                System.out.println(e.getMessage());
             }
         }
 
@@ -50,12 +46,8 @@ public class TransferService {
             HttpEntity<Transfer> entity = makeTransferEntity(authenticatedUser, transfer);
             try {
                 restTemplate.exchange(baseUrl + "/update/" + transfer.getTransferId(), HttpMethod.PUT, entity, Boolean.class);
-            } catch (RestClientResponseException e) {
-                System.out.println("Unable to update transfer status. Error code: " + e.getRawStatusCode());
-                BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
-            } catch(ResourceAccessException e) {
+            } catch (RestClientResponseException | ResourceAccessException e) {;
                 BasicLogger.log(e.getMessage());
-                System.out.println(e.getMessage());
             }
         }
 
@@ -64,17 +56,13 @@ public class TransferService {
             Transfer[] allTransfers = null;
             try {
                 allTransfers = restTemplate.exchange(baseUrl + "/user/" + accountId, HttpMethod.GET, entity, Transfer[].class).getBody();
-            } catch (RestClientResponseException e) {
-                System.out.println("Unable to display transfers. Error code: " + e.getRawStatusCode());
+            } catch (RestClientResponseException | ResourceAccessException e) {;
                 BasicLogger.log(e.getMessage());
-            } catch(ResourceAccessException e) {
-                BasicLogger.log(e.getMessage());
-                System.out.println(e.getMessage());
             }
             return allTransfers;
         }
 
-        public Transfer[] getAllPendingTransfersByAccountId(AuthenticatedUser authenticatedUser, Long accountId) {
+       /* public Transfer[] getAllPendingTransfersByAccountId(AuthenticatedUser authenticatedUser, Long accountId) {
             HttpEntity entity = makeEntity(authenticatedUser);
             Transfer[] allPendingTransfers = null;
             try {
@@ -87,19 +75,15 @@ public class TransferService {
                 System.out.println(e.getMessage());
             }
             return allPendingTransfers;
-        }
+        } */
 
         public Transfer getTransferByTransferId(AuthenticatedUser authenticatedUser, Long transferId) {
             HttpEntity entity = makeEntity(authenticatedUser);
             Transfer transfer = null;
             try {
                 transfer = restTemplate.exchange(baseUrl + transferId, HttpMethod.GET, entity, Transfer.class).getBody();
-            } catch (RestClientResponseException e) {
-                System.out.println("Unable to retrieve transfer. Error code: " + e.getRawStatusCode());
-                BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
-            } catch (ResourceAccessException e) {
+            } catch (RestClientResponseException | ResourceAccessException e) {;
                 BasicLogger.log(e.getMessage());
-                System.out.println(e.getMessage());
             }
             return transfer;
         }

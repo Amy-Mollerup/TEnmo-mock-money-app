@@ -22,7 +22,6 @@ public class AccountService {
 
     public AccountService(String url) { this.baseUrl = url + "account/"; }
 
-    //Throw user not auth exception? - I don't think so, an authenticated user will always be passed in
     /* TODO reevaluate how authorization is handled,
         possibly remove custom Exceptions for unauthorized users and use only what's built in (Client and server side)
     */

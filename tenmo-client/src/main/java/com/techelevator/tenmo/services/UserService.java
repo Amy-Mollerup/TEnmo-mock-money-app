@@ -27,12 +27,8 @@ public class UserService {
         User[] allUsers = null;
         try {
             allUsers = restTemplate.exchange(baseUrl, HttpMethod.GET, entity, User[].class).getBody();
-        } catch (RestClientResponseException e) {
-            System.out.println("Unable to display users. Error code: " + e.getRawStatusCode());
-            BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
-        } catch(ResourceAccessException e) {
+        } catch (RestClientResponseException | ResourceAccessException e) {;
             BasicLogger.log(e.getMessage());
-            System.out.println(e.getMessage());
         }
         return allUsers;
     }
@@ -43,12 +39,8 @@ public class UserService {
         try {
             user = restTemplate.exchange(baseUrl + "/" + userId, HttpMethod.GET,
                     entity, User.class).getBody();
-        } catch (RestClientResponseException e) {
-            System.out.println("Unable to locate user. Error code: " + e.getRawStatusCode());
-            BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
-        } catch (ResourceAccessException e) {
+        } catch (RestClientResponseException | ResourceAccessException e) {;
             BasicLogger.log(e.getMessage());
-            System.out.println(e.getMessage());
         }
         return user;
     }
@@ -58,12 +50,8 @@ public class UserService {
         User user = new User();
         try {
             user = restTemplate.exchange(baseUrl + "/find/" + accountId, HttpMethod.GET, entity, User.class).getBody();
-        } catch (RestClientResponseException e) {
-            System.out.println("Unable to locate user. Error code: " + e.getRawStatusCode());
-            BasicLogger.log(e.getRawStatusCode() + " : " + e.getMessage());
-        } catch (ResourceAccessException e) {
+        } catch (RestClientResponseException | ResourceAccessException e) {;
             BasicLogger.log(e.getMessage());
-            System.out.println(e.getMessage());
         }
         return user;
     }

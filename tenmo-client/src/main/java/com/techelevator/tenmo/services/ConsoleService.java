@@ -128,10 +128,13 @@ public class ConsoleService {
     public void printPendingRequests(Transfer[] transfers) {
         // TODO works, need to get username instead of accountID for TO column
         // This method runs into a hiccup with the refactoring of Services out of ConsoleService, I'm not sure how to get the usernames
+        // I can't figure out how to do this without using another service class so this might be a goner
         printHeaders("Pending Transfers", "To", true);
         for (Transfer t : transfers) {
+            if (t.getTransferStatusId() == 1) {
                 System.out.printf(largeColumnFormat, t.getTransferId(), t.getAccountTo(), t.getAmount().toString());
             }
+        }
     }
 
 

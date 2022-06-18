@@ -114,7 +114,7 @@ public class App {
 	}
 
 	private void viewPendingRequests() {
-        Transfer[] transfers = transferService.getAllPendingTransfersByAccountId(currentUser, userAccountid);
+        Transfer[] transfers = transferService.getAllTransfersByAccountId(currentUser, userAccountid);
         consoleService.printPendingRequests(transfers);
         long transferID = consoleService.promptForInt("Please enter transfer ID to approve/reject (0 to cancel): ");
         if (transferID != 0) {
@@ -123,6 +123,8 @@ public class App {
             if(choice != 0) {
                 transferService.updateTransferStatus(currentUser, transferID, choice);
             }
+        } else {
+            consoleService.printErrorMessage();
         }
 		
 	}
@@ -132,15 +134,18 @@ public class App {
         long toUserId = consoleService.promptForInt("Enter ID of user you are sending to (0 to cancel): ");
         if (toUserId != 0) {
             handleCreateTransfer("Send", toUserId);
+        } else {
+            consoleService.printErrorMessage();
         }
 	}
 
 	private void requestBucks() {
 		consoleService.printUsers(userService.getAllUsers(currentUser));
-
         long fromUserId = consoleService.promptForInt("Enter ID of user you are requesting from (0 to cancel): ");
         if (fromUserId != 0) {
             handleCreateTransfer("Request", fromUserId);
+        } else {
+            consoleService.printErrorMessage();
         }
 	}
 
