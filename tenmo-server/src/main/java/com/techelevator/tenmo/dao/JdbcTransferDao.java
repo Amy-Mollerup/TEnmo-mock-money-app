@@ -22,17 +22,17 @@ public class JdbcTransferDao implements TransferDao {
 
     public JdbcTransferDao(JdbcTemplate jdbcTemplate) { this.jdbcTemplate = jdbcTemplate; }
 
-    @Override
-    public List<Transfer> findAll() {
-        List<Transfer> transfers = new ArrayList<>();
-        String sql = "SELECT * FROM transfer;";
-        SqlRowSet results = jdbcTemplate.queryForRowSet(sql);
-        while(results.next()) {
-            Transfer transfer = mapRowToTransfer(results);
-            transfers.add(transfer);
-        }
-        return transfers;
-    }
+//    @Override
+//    public List<Transfer> findAll() {
+//        List<Transfer> transfers = new ArrayList<>();
+//        String sql = "SELECT * FROM transfer;";
+//        SqlRowSet results = jdbcTemplate.queryForRowSet(sql);
+//        while(results.next()) {
+//            Transfer transfer = mapRowToTransfer(results);
+//            transfers.add(transfer);
+//        }
+//        return transfers;
+//    }
 
     @Override
     public List<Transfer> findByAccountId(Long accountId) {
@@ -75,21 +75,21 @@ public class JdbcTransferDao implements TransferDao {
         return success;
     }
 
-    @Override //setting up our transfer requests from one user to another
-    public boolean createRequestTransfer(Long accountFrom, Long accountTo, BigDecimal amount) {
-        String sql = "INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount) " +
-                "VALUES (1, 1, ?, ?, ?)";
-        boolean success = false;
-        try {
-            jdbcTemplate.update(sql, accountFrom, accountTo, amount);
-            success = true;
-        } catch (TransferAmountZeroOrLessException e) {
-            System.out.println(e.getMessage());
-        } catch(DataAccessException e) {
-            System.out.println("Error accessing data");
-        }
-        return success;
-    }
+//    @Override //setting up our transfer requests from one user to another
+//    public boolean createRequestTransfer(Long accountFrom, Long accountTo, BigDecimal amount) {
+//        String sql = "INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount) " +
+//                "VALUES (1, 1, ?, ?, ?)";
+//        boolean success = false;
+//        try {
+//            jdbcTemplate.update(sql, accountFrom, accountTo, amount);
+//            success = true;
+//        } catch (TransferAmountZeroOrLessException e) {
+//            System.out.println(e.getMessage());
+//        } catch(DataAccessException e) {
+//            System.out.println("Error accessing data");
+//        }
+//        return success;
+//    }
 
     @Override
     public boolean updateTransferStatus(Long transferId, int transferStatusId) {
@@ -105,22 +105,22 @@ public class JdbcTransferDao implements TransferDao {
         return success;
     }
 
-    @Override //retrieves transfer status description
-    public String getTransferStatus(Long id) throws TransferIdDoesNotExistException {
-        String transferStatus = null;
-        String sql = "SELECT transfer_type_desc FROM transfer_type " +
-                    "JOIN transfer ON transfer_type.transfer_type_id = transfer.transfer_type_id " +
-                    "WHERE transfer_id = ?;";
-        try {
-            transferStatus = String.valueOf(jdbcTemplate.queryForRowSet(sql, id));
-        } catch (TransferIdDoesNotExistException e) {
-            System.out.println(e.getMessage());
-        } catch (DataAccessException e ) {
-            System.out.println("Error accessing data");
-        }
-        return transferStatus;
-
-    }
+//    @Override //retrieves transfer status description
+//    public String getTransferStatus(Long id) throws TransferIdDoesNotExistException {
+//        String transferStatus = null;
+//        String sql = "SELECT transfer_type_desc FROM transfer_type " +
+//                    "JOIN transfer ON transfer_type.transfer_type_id = transfer.transfer_type_id " +
+//                    "WHERE transfer_id = ?;";
+//        try {
+//            transferStatus = String.valueOf(jdbcTemplate.queryForRowSet(sql, id));
+//        } catch (TransferIdDoesNotExistException e) {
+//            System.out.println(e.getMessage());
+//        } catch (DataAccessException e ) {
+//            System.out.println("Error accessing data");
+//        }
+//        return transferStatus;
+//
+//    }
 
     @Override
     public List<Transfer> findPendingByAccountId(Long accountId) {

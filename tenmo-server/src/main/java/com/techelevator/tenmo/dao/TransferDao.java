@@ -7,7 +7,8 @@ import java.util.List;
 
 public interface TransferDao {
 
-    List<Transfer> findAll();
+//    UNUSED
+//    List<Transfer> findAll();
 
     List<Transfer> findByAccountId(Long accountId);
 
@@ -15,11 +16,13 @@ public interface TransferDao {
 
     boolean createTransfer(Transfer transfer);
 
-    boolean createRequestTransfer(Long accountFrom, Long accountTo, BigDecimal amount);
+//    UNUSED
+//    boolean createRequestTransfer(Long accountFrom, Long accountTo, BigDecimal amount);
 
     boolean updateTransferStatus(Long transferId, int transferStatusId);
 
-    String getTransferStatus(Long transferId);
+//    UNUSED
+//    String getTransferStatus(Long transferId);
 
     List<Transfer> findPendingByAccountId(Long accountId); //account from id
 }

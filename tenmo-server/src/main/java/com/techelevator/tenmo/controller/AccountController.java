@@ -34,9 +34,12 @@ public class AccountController {
         return accountDao.getBalance(accountId);
     }
 
+
+    /* Deposit and Withdraw may be unnecessary endpoints. The methods are used by TransferController, through the Dao,
+     but the endpoints are never used by the client
+    */
     @PutMapping("/{accountId}/deposit")
     public BigDecimal deposit(@PathVariable long accountId, @RequestBody String amount) {
-        //Ran into error using @RequestBody, could not parse BigDecimal, could try to fix later
         return accountDao.deposit(accountId, BigDecimal.valueOf(Double.parseDouble(amount)));
     }
 

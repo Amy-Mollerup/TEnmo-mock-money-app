@@ -19,7 +19,7 @@ public interface AccountDao {
     Account find(long userId) throws UsernameNotFoundException;
 
     // Finds full account information by Account ID
-    Account findById(long accountId);
+//    Account findById(long accountId);
 
 
 

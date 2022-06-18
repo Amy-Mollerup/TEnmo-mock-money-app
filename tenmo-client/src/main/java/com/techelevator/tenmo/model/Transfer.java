@@ -9,6 +9,7 @@ public class Transfer {
     private int transferStatusId;
     private Long accountFrom;
     private Long accountTo;
+    // TODO Should we set the formatting of BigDecimal in here? Would it always be consistent?
     private BigDecimal amount;
 
     public Transfer() {
@@ -71,6 +72,23 @@ public class Transfer {
         this.amount = amount;
     }
 
+    public String getTransferTypeDescription() {
+        switch(this.transferTypeId) {
+            case 1: return "Request";
+            case 2: return "Send";
+            default: return "No Transfer Type Given";
+        }
+    }
+
+    public String getTransferStatusDescription() {
+        switch(this.transferStatusId) {
+            case 1: return "Pending";
+            case 2: return "Approved";
+            case 3: return "Rejected";
+            default: return "No Transfer Status Given";
+        }
+    }
+
     @Override
     public String toString() {
         return "\nID: " + transferId +
@@ -78,7 +96,16 @@ public class Transfer {
                 "\nTo: " + accountTo +
                 "\nType: " + transferTypeId +
                 "\nStatus: " + transferStatusId +
-                "\nAmount: " + amount;
+                "\nAmount: $" + amount;
+    }
+
+    public String toDetailedString(String accountFrom, String accountTo) {
+        return "\nID: " + transferId +
+                "\nFrom: " + accountFrom +
+                "\nTo: " + accountTo +
+                "\nType: " + getTransferTypeDescription() +
+                "\nStatus: " + getTransferStatusDescription() +
+                "\nAmount: $" + amount;
     }
 
 }

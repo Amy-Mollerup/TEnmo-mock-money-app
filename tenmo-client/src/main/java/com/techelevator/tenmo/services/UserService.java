@@ -65,7 +65,6 @@ public class UserService {
             BasicLogger.log(e.getMessage());
             System.out.println(e.getMessage());
         }
-        System.out.println(user.getUsername() +  user.getId());
         return user;
     }
 
