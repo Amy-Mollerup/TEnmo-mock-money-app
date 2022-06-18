@@ -29,71 +29,29 @@ public class TransferController {
     }
 
     @GetMapping("/user/{id}")
-    //works in postman
     public List<Transfer> getTransferByAccountId(@PathVariable Long id) {
         return transferDao.findByAccountId(id);
     }
 
-    @GetMapping("pending/{accountId}")
-    public List<Transfer> getPendingTransfersByAccountId(@PathVariable Long accountId) {
-        return transferDao.findPendingByAccountId(accountId);
-    }
+//    @GetMapping("pending/{accountId}")
+//    public List<Transfer> getPendingTransfersByAccountId(@PathVariable Long accountId) {
+//        return transferDao.findPendingByAccountId(accountId);
+//    }
 
     @GetMapping("/{id}")//get transfer by id
     public Transfer getTransferById(@PathVariable Long id) {
         return transferDao.findByTransferId(id);
-
-//        Transfer transferByID = null;
-//        try {
-//            transferByID = transferDao.findByTransferId(id);
-//        } catch (RestClientResponseException e) {
-//            BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
-//        } catch (Exception e) {
-//            BasicLogger.log(e.getMessage());
-//        }
-//        return transferByID;
     }
 
     @PostMapping()
     public boolean createTransfer(@RequestBody Transfer transfer) {
-        Long accountFrom = transfer.getAccountFrom();
-        Long accountTo = transfer.getAccountTo();
-        BigDecimal amount = transfer.getAmount();
-
-        boolean success = false;
-        try {
-            transferDao.createTransfer(transfer);
-            accountDao.withdraw(accountFrom, amount);
-            accountDao.deposit(accountTo, amount);
-            success = true;
-        } catch (RestClientResponseException e) {
-            BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
-        }
-        catch (ResourceAccessException e) {
-            BasicLogger.log(e.getMessage());
-        }
-        return success;
+        return transferDao.createTransfer(transfer);
     }
 
     @PutMapping("/update/{transferId}")
-    public boolean updateTransferStatus(@RequestBody Transfer transfer, @PathVariable Long transferId) throws Exception {
-        boolean success = false;
-
-        try {
-            if (transfer.getTransferStatusId() == 2) {
-                accountDao.withdraw(transfer.getAccountFrom(), transfer.getAmount());
-                accountDao.deposit(transfer.getAccountTo(), transfer.getAmount());
-            }
-            transferDao.updateTransferStatus(transferId, transfer.getTransferStatusId());
-            success = true;
-        }
-        catch (RestClientResponseException e) {
-            BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
-        }
-        catch (ResourceAccessException e) {
-            BasicLogger.log(e.getMessage());
-        }
-        return success;
+    public boolean updateTransferStatus(@RequestBody Transfer transfer, @PathVariable Long transferId) {
+        // TODO - does this need a Path Variable anymore?
+            return transferDao.updateTransferStatus(transfer);
     }
 
 

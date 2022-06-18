@@ -4,6 +4,7 @@ import com.techelevator.tenmo.exceptions.TransferAmountZeroOrLessException;
 import com.techelevator.tenmo.exceptions.TransferAttemptExceedsAccountBalException;
 import com.techelevator.tenmo.exceptions.UserNotAuthorizedException;
 import com.techelevator.tenmo.model.Account;
+import com.techelevator.tenmo.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -47,16 +48,15 @@ public class JdbcAccountDao implements AccountDao {
     //returns specific account based on userId of receiver that sender must enter
     //works in postman
     public Account find(long userId) throws UsernameNotFoundException {
-
-        Account account1 = null;
         String sql = "SELECT * " +
                 "FROM account " +
                 "WHERE user_id = ?;";
         SqlRowSet results = jdbcTemplate.queryForRowSet(sql, userId);
         if (results.next()) {
-            account1 = mapRowToAccount(results);
+            return mapRowToAccount(results);
+        } else {
+            throw new UsernameNotFoundException("Could not find account");
         }
-        return account1;
     }
 
 
@@ -64,28 +64,27 @@ public class JdbcAccountDao implements AccountDao {
     //id belongs to the user and the user is authorized
     //isFullyAuthenticated() && hasRole('user')
     @Override //retrieves current balance from account based on userId
-    public BigDecimal getBalance(long accountId) {
+    public BigDecimal getBalance(long accountId) throws UsernameNotFoundException {
         BigDecimal balance = null;
         String sql = "SELECT balance FROM account " +
                 "WHERE account_id = ?;";
-        try {
-            balance = jdbcTemplate.queryForObject(sql, BigDecimal.class, accountId);
-        } catch (DataAccessException e) {
-            System.out.println("Error accessing balance");
+        balance = jdbcTemplate.queryForObject(sql, BigDecimal.class, accountId);
+        if (balance == null) {
+            throw new UsernameNotFoundException("Could not find account balance");
         }
         return balance;
     }
 
     @Override //adds to balance in account, returns updated balance
-    public BigDecimal deposit(long accountId, BigDecimal amount)
-    { // passing userId so method can be called in transfers, amount to update bal by
+    public BigDecimal deposit(long accountId, BigDecimal amount) throws UsernameNotFoundException  {
+        // passing userId so method can be called in transfers, amount to update bal by
         BigDecimal newBal = getBalance(accountId).add(amount);
         String sql = "UPDATE account SET balance = ? " +
                 "WHERE account_id = ?;";
-        try {
-            jdbcTemplate.update(sql, newBal, accountId);
-        } catch (UserNotAuthorizedException e) {
-            System.out.println(e.getMessage());
+        int lines = jdbcTemplate.update(sql, newBal, accountId);
+
+        if (lines == 0) {
+            throw new UsernameNotFoundException("Could not update balance");
         }
         return newBal;
 
@@ -94,16 +93,18 @@ public class JdbcAccountDao implements AccountDao {
 
     @Override //subtracts from balance in account, returns updated balance
     //BIG DECIMAL SUCKS - will throw numberformatexception if less than 0
-    public BigDecimal withdraw(long accountId, BigDecimal amount) throws TransferAmountZeroOrLessException, TransferAttemptExceedsAccountBalException {
+    // TODO check exception handling on this method
+    public BigDecimal withdraw(long accountId, BigDecimal amount) throws TransferAmountZeroOrLessException,
+            TransferAttemptExceedsAccountBalException, UsernameNotFoundException {
+
         BigDecimal newBal = getBalance(accountId).subtract(amount);
         if(newBal.compareTo(ZERO) >= 0 && amount.compareTo(ZERO) > 0) {
             String sql = "UPDATE account SET balance = ? " +
                     "WHERE account_id = ?;";
-            try {
-                jdbcTemplate.update(sql, newBal, accountId);
-            } catch (DataAccessException e) {
-                System.out.println("Error accessing data");
-            }
+            int lines = jdbcTemplate.update(sql, newBal, accountId);
+            if (lines == 0) {
+                throw new UsernameNotFoundException("Could not update balance");
+        }
         } else if(amount.compareTo(ZERO) <= 0) {
             throw new TransferAmountZeroOrLessException();
         } else if(newBal.compareTo(ZERO) < 0) {

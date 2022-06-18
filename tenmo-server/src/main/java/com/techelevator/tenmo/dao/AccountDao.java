@@ -30,7 +30,7 @@ public interface AccountDao {
 
 //    Account updateBalance(int balance, long id);
 
-    BigDecimal withdraw(long accountId, BigDecimal amount) throws UserNotAuthorizedException, TransferAttemptExceedsAccountBalException;
+    BigDecimal withdraw(long accountId, BigDecimal amount) throws UserNotAuthorizedException, TransferAttemptExceedsAccountBalException, UsernameNotFoundException;
     //can also have this throw balance cannot be 0 exception
 
  //   void delete(long accountId, long userId) throws UserNotAuthorizedException;

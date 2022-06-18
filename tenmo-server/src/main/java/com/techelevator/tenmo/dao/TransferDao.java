@@ -19,10 +19,11 @@ public interface TransferDao {
 //    UNUSED
 //    boolean createRequestTransfer(Long accountFrom, Long accountTo, BigDecimal amount);
 
-    boolean updateTransferStatus(Long transferId, int transferStatusId);
+    boolean updateTransferStatus(Transfer transfer);
 
 //    UNUSED
 //    String getTransferStatus(Long transferId);
 
-    List<Transfer> findPendingByAccountId(Long accountId); //account from id
+//    List<Transfer> findPendingByAccountId(Long accountId); //account from id
+
 }

@@ -128,9 +128,7 @@ public class App {
 	}
 
 	private void sendBucks() {
-
         consoleService.printUsers(userService.getAllUsers(currentUser));
-
         long toUserId = consoleService.promptForInt("Enter ID of user you are sending to (0 to cancel): ");
         if (toUserId != 0) {
             handleCreateTransfer("Send", toUserId);
