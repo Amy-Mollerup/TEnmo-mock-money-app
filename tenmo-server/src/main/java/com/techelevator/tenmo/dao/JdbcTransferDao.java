@@ -125,7 +125,7 @@ public class JdbcTransferDao implements TransferDao {
     @Override
     public List<Transfer> findPendingByAccountId(Long accountId) {
         List<Transfer> pendingTransfers = new ArrayList<>();
-        String sql = "SELECT * FROM transfer WHERE account_from = ?;";
+        String sql = "SELECT * FROM transfer WHERE account_from = ? AND transfer_status_id = 1;";
         SqlRowSet results = jdbcTemplate.queryForRowSet(sql, accountId);
         while(results.next()) {
             Transfer transfer = mapRowToTransfer(results);
