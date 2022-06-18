@@ -5,20 +5,19 @@ import java.math.BigDecimal;
 public class Transfer {
 
     private Long transferId;
-    private int transferTypeId;
-    private int transferStatusId;
-    private Long accountFrom;
-    private Long accountTo;
-    // TODO Should we set the formatting of BigDecimal in here? Would it always be consistent?
+    private String transferType;
+    private String transferStatus;
+    private String accountFrom;
+    private String accountTo;
     private BigDecimal amount;
 
     public Transfer() {
     }
 
-    public Transfer(Long transferId, int transferTypeId, int transferStatusId, Long accountFrom, Long accountTo, BigDecimal amount) {
+    public Transfer(Long transferId, String transferType, String transferStatus, String accountFrom, String accountTo, BigDecimal amount) {
         this.transferId = transferId;
-        this.transferTypeId = transferTypeId;
-        this.transferStatusId = transferStatusId;
+        this.transferType = transferType;
+        this.transferStatus = transferStatus;
         this.accountFrom = accountFrom;
         this.accountTo = accountTo;
         this.amount = amount;
@@ -32,35 +31,35 @@ public class Transfer {
         this.transferId = transferId;
     }
 
-    public int getTransferTypeId() {
-        return transferTypeId;
+    public String getTransferType() {
+        return transferType;
     }
 
-    public void setTransferTypeId(int transferTypeId) {
-        this.transferTypeId = transferTypeId;
+    public void setTransferType(String transferType) {
+        this.transferType = transferType;
     }
 
-    public int getTransferStatusId() {
-        return transferStatusId;
+    public String getTransferStatus() {
+        return transferStatus;
     }
 
-    public void setTransferStatusId(int transferStatusId) {
-        this.transferStatusId = transferStatusId;
+    public void setTransferStatus(String transferStatus) {
+        this.transferStatus = transferStatus;
     }
 
-    public Long getAccountFrom() {
+    public String getAccountFrom() {
         return accountFrom;
     }
 
-    public void setAccountFrom(Long accountFrom) {
+    public void setAccountFrom(String accountFrom) {
         this.accountFrom = accountFrom;
     }
 
-    public Long getAccountTo() {
+    public String getAccountTo() {
         return accountTo;
     }
 
-    public void setAccountTo(Long accountTo) {
+    public void setAccountTo(String accountTo) {
         this.accountTo = accountTo;
     }
 
@@ -72,40 +71,13 @@ public class Transfer {
         this.amount = amount;
     }
 
-    public String getTransferTypeDescription() {
-        switch(this.transferTypeId) {
-            case 1: return "Request";
-            case 2: return "Send";
-            default: return "No Transfer Type Given";
-        }
-    }
-
-    public String getTransferStatusDescription() {
-        switch(this.transferStatusId) {
-            case 1: return "Pending";
-            case 2: return "Approved";
-            case 3: return "Rejected";
-            default: return "No Transfer Status Given";
-        }
-    }
-
     @Override
     public String toString() {
         return "\nID: " + transferId +
                 "\nFrom: " + accountFrom +
                 "\nTo: " + accountTo +
-                "\nType: " + transferTypeId +
-                "\nStatus: " + transferStatusId +
+                "\nType: " + transferType +
+                "\nStatus: " + transferStatus +
                 "\nAmount: $" + amount;
     }
-
-    public String toDetailedString(String accountFrom, String accountTo) {
-        return "\nID: " + transferId +
-                "\nFrom: " + accountFrom +
-                "\nTo: " + accountTo +
-                "\nType: " + getTransferTypeDescription() +
-                "\nStatus: " + getTransferStatusDescription() +
-                "\nAmount: $" + amount;
-    }
-
 }

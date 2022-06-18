@@ -2,16 +2,13 @@ package com.techelevator.tenmo.controller;
 
 import com.techelevator.tenmo.dao.AccountDao;
 import com.techelevator.tenmo.dao.TransferDao;
-import com.techelevator.tenmo.exceptions.TransferIdDoesNotExistException;
 import com.techelevator.tenmo.model.Transfer;
-import com.techelevator.util.BasicLogger;
+import com.techelevator.tenmo.model.TransferDto;
+import com.techelevator.tenmo.model.TransferDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.ResourceAccessException;
-import org.springframework.web.client.RestClientResponseException;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -33,25 +30,25 @@ public class TransferController {
         return transferDao.findByAccountId(id);
     }
 
-//    @GetMapping("pending/{accountId}")
-//    public List<Transfer> getPendingTransfersByAccountId(@PathVariable Long accountId) {
-//        return transferDao.findPendingByAccountId(accountId);
-//    }
-
     @GetMapping("/{id}")//get transfer by id
-    public Transfer getTransferById(@PathVariable Long id) {
+    public TransferDTO getTransferById(@PathVariable Long id) {
         return transferDao.findByTransferId(id);
     }
 
     @PostMapping()
-    public boolean createTransfer(@RequestBody Transfer transfer) {
-        return transferDao.createTransfer(transfer);
+    public boolean createTransfer(@RequestBody TransferDTO transferDTO) {
+        return transferDao.createTransfer(transferDTO);
     }
 
     @PutMapping("/update/{transferId}")
-    public boolean updateTransferStatus(@RequestBody Transfer transfer, @PathVariable Long transferId) {
+    public boolean updateTransferStatus(@RequestBody TransferDTO transferDTO, @PathVariable Long transferId) {
         // TODO - does this need a Path Variable anymore?
-            return transferDao.updateTransferStatus(transfer);
+            return transferDao.updateTransferStatus(transferDTO);
+    }
+
+    @GetMapping("/getinfo/{transferId}")
+    public Transfer getTransferDetails(@PathVariable Long transferId) {
+        return transferDao.convertFromDTO(transferId);
     }
 
 

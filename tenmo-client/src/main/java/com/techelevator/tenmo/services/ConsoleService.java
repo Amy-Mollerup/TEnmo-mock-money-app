@@ -8,8 +8,6 @@ import java.util.Scanner;
 
 public class ConsoleService {
 
-    private static final String API_BASE_URL = "http://localhost:8080/";
-
     private final Scanner scanner = new Scanner(System.in);
     private final String dashes = String.format("%043d", 0).replace("0", "-");
     // No amount column
@@ -125,13 +123,10 @@ public class ConsoleService {
         System.out.println(dashes);
     }
 
-    public void printPendingRequests(Transfer[] transfers) {
-        // TODO works, need to get username instead of accountID for TO column
-        // This method runs into a hiccup with the refactoring of Services out of ConsoleService, I'm not sure how to get the usernames
-        // I can't figure out how to do this without using another service class so this might be a goner
+    public void printPendingRequests(Transfer[] transfers, String username) {
         printHeaders("Pending Transfers", "To", true);
         for (Transfer t : transfers) {
-            if (t.getTransferStatusId() == 1) {
+            if (t.getTransferStatus().equals("Pending") && t.getAccountFrom().equals(username)) {
                 System.out.printf(largeColumnFormat, t.getTransferId(), t.getAccountTo(), t.getAmount().toString());
             }
         }
@@ -139,36 +134,18 @@ public class ConsoleService {
 
 
     public void printTransferHistory(Transfer[] transfers) {
-        //  TODO amount needs to be corrected - pulling wrong data - check if this is still the case
         printHeaders("Transfer History", "From/To", true);
         for (Transfer t : transfers) {
-            if (t.getTransferTypeId() == 1) {
-                System.out.printf(largeColumnFormat, t.getTransferId(), "From: " + t.getAccountFrom(), t.getAmount().toString());
-            } else {
-                System.out.printf(largeColumnFormat, t.getTransferId(), "To:   " + t.getAccountTo(), t.getAmount().toString());
+            if(!t.getTransferStatus().equals("Pending")) {
+                if (t.getTransferType().equals("Request")) {
+                    System.out.printf(largeColumnFormat, t.getTransferId(), "From: " + t.getAccountFrom(), t.getAmount().toString());
+                } else {
+                    System.out.printf(largeColumnFormat, t.getTransferId(), "To:   " + t.getAccountTo(), t.getAmount().toString());
+                }
             }
         }
 
 
     }
-
-
-//  This big mess has been simplified and added to the Transfer model for now. There may be a better solution for the accountFrom and accountTo
-//
-//    public void transferDetails(AuthenticatedUser authenticatedUser, Transfer transfer) {
-//        String transferId = transfer.getTransferId().toString();
-//        String accountFrom = userService.getUserByAccountId(authenticatedUser, transfer.getAccountFrom()).getUsername();
-//        String accountTo = userService.getUserByAccountId(authenticatedUser, transfer.getAccountTo()).getUsername();
-//        String transferTypeDescription = transfer.getTransferTypeDescription();
-//        String transferStatusDescription = transfer.getTransferStatusDescription();
-//        String amount = transfer.getAmount().toString();
-//
-//        System.out.println("\nID: " + transferId +
-//                    "\nFrom: " + accountFrom +
-//                    "\nTo: " + accountTo +
-//                    "\nType: " + transferTypeDescription +
-//                    "\nStatus: " + transferStatusDescription +
-//                    "\nAmount: $" + amount);
-//    }
 }
 

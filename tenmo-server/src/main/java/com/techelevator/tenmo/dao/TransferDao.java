@@ -1,29 +1,21 @@
 package com.techelevator.tenmo.dao;
 
 import com.techelevator.tenmo.model.Transfer;
+import com.techelevator.tenmo.model.TransferDto;
+import com.techelevator.tenmo.model.TransferDTO;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 public interface TransferDao {
 
-//    UNUSED
-//    List<Transfer> findAll();
-
     List<Transfer> findByAccountId(Long accountId);
 
-    Transfer findByTransferId(Long id);
+    TransferDTO findByTransferId(Long id);
 
-    boolean createTransfer(Transfer transfer);
+    boolean createTransfer(TransferDTO transferDTO);
 
-//    UNUSED
-//    boolean createRequestTransfer(Long accountFrom, Long accountTo, BigDecimal amount);
+    boolean updateTransferStatus(TransferDTO transferDTO);
 
-    boolean updateTransferStatus(Transfer transfer);
-
-//    UNUSED
-//    String getTransferStatus(Long transferId);
-
-//    List<Transfer> findPendingByAccountId(Long accountId); //account from id
+    Transfer convertFromDTO(Long transferId);
 
 }

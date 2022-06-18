@@ -2,6 +2,7 @@ package com.techelevator.tenmo;
 
 import com.techelevator.tenmo.model.AuthenticatedUser;
 import com.techelevator.tenmo.model.Transfer;
+import com.techelevator.tenmo.model.TransferDto;
 import com.techelevator.tenmo.model.UserCredentials;
 import com.techelevator.tenmo.services.*;
 
@@ -18,7 +19,7 @@ public class App {
     private final TransferService transferService = new TransferService(API_BASE_URL);
 
     private AuthenticatedUser currentUser;
-    private long userAccountid;
+    private long userAccountId;
 
     public static void main(String[] args) {
         App app = new App();
@@ -62,7 +63,7 @@ public class App {
     private void handleLogin() {
         UserCredentials credentials = consoleService.promptForCredentials();
         currentUser = authenticationService.login(credentials);
-        userAccountid = accountService.getAccountByUserId(currentUser, currentUser.getUser().getId()).getAccountId();
+        userAccountId = accountService.getAccountByUserId(currentUser, currentUser.getUser().getId()).getAccountId();
         if (currentUser == null) {
             consoleService.printErrorMessage();
         }
@@ -102,20 +103,18 @@ public class App {
 	}
 
 	private void viewTransferHistory() {
-        Transfer[] transfers = transferService.getAllTransfersByAccountId(currentUser, userAccountid);
+        Transfer[] transfers = transferService.getAllTransfersByAccountId(currentUser, userAccountId);
 		consoleService.printTransferHistory(transfers);
         long transferId = consoleService.promptForInt("Please enter Transfer ID to view details (0 to cancel): ");
         if (transferId != 0) {
             Transfer transfer = transferService.getTransferByTransferId(currentUser, transferId);
-        String accountFrom = userService.getUserByAccountId(currentUser, transfer.getAccountFrom()).getUsername();
-        String accountTo = userService.getUserByAccountId(currentUser, transfer.getAccountTo()).getUsername();
-        transfer.toDetailedString(accountFrom, accountTo);
+            System.out.println(transfer);
         }
 	}
 
 	private void viewPendingRequests() {
-        Transfer[] transfers = transferService.getAllTransfersByAccountId(currentUser, userAccountid);
-        consoleService.printPendingRequests(transfers);
+        Transfer[] transfers = transferService.getAllTransfersByAccountId(currentUser, userAccountId);
+        consoleService.printPendingRequests(transfers, currentUser.getUser().getUsername());
         long transferID = consoleService.promptForInt("Please enter transfer ID to approve/reject (0 to cancel): ");
         if (transferID != 0) {
             consoleService.printTransferUpdateChoiceMenu();
@@ -123,8 +122,6 @@ public class App {
             if(choice != 0) {
                 transferService.updateTransferStatus(currentUser, transferID, choice);
             }
-        } else {
-            consoleService.printErrorMessage();
         }
 		
 	}
@@ -155,9 +152,9 @@ public class App {
         BigDecimal amount = consoleService.promptForBigDecimal("Enter amount: ");
 
         if(transferType.equals("Send")) {
-            transferService.createTransfer(currentUser, 2, userAccountid, secondPartyAccountId, amount);
+            transferService.createTransfer(currentUser, 2, userAccountId, secondPartyAccountId, amount);
         } else if(transferType.equals("Request")) {
-            transferService.createTransfer(currentUser, 1, secondPartyAccountId, userAccountid, amount);
+            transferService.createTransfer(currentUser, 1, secondPartyAccountId, userAccountId, amount);
         }
     }
 

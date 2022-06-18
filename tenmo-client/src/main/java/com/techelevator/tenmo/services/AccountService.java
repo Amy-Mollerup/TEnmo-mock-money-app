@@ -27,7 +27,7 @@ public class AccountService {
     */
     public BigDecimal getBalance(AuthenticatedUser authenticatedUser) {
         Account account = getAccountByUserId(authenticatedUser, authenticatedUser.getUser().getId());
-        HttpEntity entity = makeEntity(authenticatedUser);
+        HttpEntity<Void> entity = makeEntity(authenticatedUser);
         Long accountId = account.getAccountId();
         BigDecimal balance = null;
         try {
@@ -40,7 +40,7 @@ public class AccountService {
         return balance;
     }
     public Account getAccountByUserId(AuthenticatedUser authenticatedUser, Long userId) {
-        HttpEntity entity = makeEntity(authenticatedUser);
+        HttpEntity<Void> entity = makeEntity(authenticatedUser);
         Account account = null;
         try {
             account = restTemplate.exchange(baseUrl + userId, HttpMethod.GET, entity,
@@ -53,11 +53,10 @@ public class AccountService {
     }
 
 
-    private HttpEntity makeEntity(AuthenticatedUser authenticatedUser) {
+    private HttpEntity<Void> makeEntity(AuthenticatedUser authenticatedUser) {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(authenticatedUser.getToken());
-        HttpEntity entity = new HttpEntity(headers);
-        return entity;
+        return new HttpEntity<>(headers);
     }
 
 

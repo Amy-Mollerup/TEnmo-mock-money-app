@@ -3,6 +3,7 @@ package com.techelevator.tenmo.services;
 
 import com.techelevator.tenmo.model.AuthenticatedUser;
 import com.techelevator.tenmo.model.Transfer;
+import com.techelevator.tenmo.model.TransferDto;
 import com.techelevator.util.BasicLogger;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -16,7 +17,7 @@ import java.math.BigDecimal;
 
 public class TransferService {
 
-        private RestTemplate restTemplate = new RestTemplate();
+        private final RestTemplate restTemplate = new RestTemplate();
         private final String baseUrl;
 
         public TransferService(String url) {
@@ -24,14 +25,14 @@ public class TransferService {
         }
 
         public void createTransfer(AuthenticatedUser authenticatedUser, int transferTypeID, Long fromAccountId, Long toAccountId, BigDecimal amount) {
-            Transfer transfer = new Transfer();
-            transfer.setTransferTypeId(transferTypeID);
-            transfer.setTransferStatusId(transferTypeID);
-            transfer.setAccountFrom(fromAccountId);
-            transfer.setAccountTo(toAccountId);
-            transfer.setAmount(amount);
+            TransferDto transferDto = new TransferDto();
+            transferDto.setTransferTypeId(transferTypeID);
+            transferDto.setTransferStatusId(transferTypeID);
+            transferDto.setAccountFrom(fromAccountId);
+            transferDto.setAccountTo(toAccountId);
+            transferDto.setAmount(amount);
 
-            HttpEntity<Transfer> entity = makeTransferEntity(authenticatedUser, transfer);
+            HttpEntity<TransferDto> entity = makeTransferEntity(authenticatedUser, transferDto);
             try {
                 restTemplate.exchange(baseUrl, HttpMethod.POST, entity, Boolean.class);
             } catch (RestClientResponseException | ResourceAccessException e) {;
@@ -41,18 +42,18 @@ public class TransferService {
 
         public void updateTransferStatus(AuthenticatedUser authenticatedUser, Long transferId, int choice) {
             choice++;
-            Transfer transfer = getTransferByTransferId(authenticatedUser, transferId);
-            transfer.setTransferStatusId(choice);
-            HttpEntity<Transfer> entity = makeTransferEntity(authenticatedUser, transfer);
+            TransferDto transferDto = getTransferDtoByTransferId(authenticatedUser, transferId);
+            transferDto.setTransferStatusId(choice);
+            HttpEntity<TransferDto> entity = makeTransferEntity(authenticatedUser, transferDto);
             try {
-                restTemplate.exchange(baseUrl + "/update/" + transfer.getTransferId(), HttpMethod.PUT, entity, Boolean.class);
+                restTemplate.exchange(baseUrl + "/update/" + transferDto.getTransferId(), HttpMethod.PUT, entity, Boolean.class);
             } catch (RestClientResponseException | ResourceAccessException e) {;
                 BasicLogger.log(e.getMessage());
             }
         }
 
         public Transfer[] getAllTransfersByAccountId(AuthenticatedUser authenticatedUser, Long accountId) {
-            HttpEntity entity = makeEntity(authenticatedUser);
+            HttpEntity<Void> entity = makeAuthEntity(authenticatedUser);
             Transfer[] allTransfers = null;
             try {
                 allTransfers = restTemplate.exchange(baseUrl + "/user/" + accountId, HttpMethod.GET, entity, Transfer[].class).getBody();
@@ -62,116 +63,40 @@ public class TransferService {
             return allTransfers;
         }
 
-       /* public Transfer[] getAllPendingTransfersByAccountId(AuthenticatedUser authenticatedUser, Long accountId) {
-            HttpEntity entity = makeEntity(authenticatedUser);
-            Transfer[] allPendingTransfers = null;
-            try {
-                allPendingTransfers = restTemplate.exchange(baseUrl + "/pending/" + accountId, HttpMethod.GET, entity, Transfer[].class).getBody();
-            } catch (RestClientResponseException e) {
-                System.out.println("Unable to display pending transfers. Error code: " + e.getRawStatusCode());
-                BasicLogger.log(e.getMessage());
-            } catch(ResourceAccessException e) {
-                BasicLogger.log(e.getMessage());
-                System.out.println(e.getMessage());
-            }
-            return allPendingTransfers;
-        } */
-
         public Transfer getTransferByTransferId(AuthenticatedUser authenticatedUser, Long transferId) {
-            HttpEntity entity = makeEntity(authenticatedUser);
+            HttpEntity<Void> entity = makeAuthEntity(authenticatedUser);
             Transfer transfer = null;
             try {
-                transfer = restTemplate.exchange(baseUrl + transferId, HttpMethod.GET, entity, Transfer.class).getBody();
+                transfer = restTemplate.exchange(baseUrl + "/getinfo/" + transferId, HttpMethod.GET, entity, Transfer.class).getBody();
             } catch (RestClientResponseException | ResourceAccessException e) {;
                 BasicLogger.log(e.getMessage());
             }
             return transfer;
         }
 
-
-        private HttpEntity makeEntity(AuthenticatedUser authenticatedUser){
-            HttpHeaders headers = new HttpHeaders();
-            headers.setBearerAuth(authenticatedUser.getToken());
-            HttpEntity entity = new HttpEntity(headers);
-            return entity;
+        public TransferDto getTransferDtoByTransferId(AuthenticatedUser authenticatedUser, Long transferId) {
+            HttpEntity<Void> entity = makeAuthEntity(authenticatedUser);
+            TransferDto transferDto = null;
+            try {
+                transferDto = restTemplate.exchange(baseUrl + transferId, HttpMethod.GET, entity, TransferDto.class).getBody();
+            } catch (RestClientResponseException | ResourceAccessException e) {;
+                BasicLogger.log(e.getMessage());
+            }
+            return transferDto;
         }
 
-        private HttpEntity<Transfer> makeTransferEntity(AuthenticatedUser user, Transfer transfer) {
+        private HttpEntity<Void> makeAuthEntity(AuthenticatedUser authenticatedUser){
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(authenticatedUser.getToken());
+            return new HttpEntity<>(headers);
+        }
+
+        private HttpEntity<TransferDto> makeTransferEntity(AuthenticatedUser user, TransferDto transferDto) {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.setBearerAuth(user.getToken());
-            return new HttpEntity<>(transfer, headers);
+            return new HttpEntity<>(transferDto, headers);
         }
-
-// UNUSED
-//        public Transfer[] getTransfersByStatus(AuthenticatedUser authenticatedUser, Long transferStatusId) {
-//            HttpEntity entity = makeEntity(authenticatedUser); //can this be set up to just return literally the transfer status text?
-//            Transfer[] transfersByStatus = null;
-//            try {
-//                transfersByStatus = restTemplate.exchange(baseUrl + transferStatusId, HttpMethod.GET, entity, Transfer[].class).getBody();
-//            } catch (RestClientResponseException e) {
-//                System.out.println("Unable to display transfers. Error code: " + e.getRawStatusCode());
-//                BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
-//            } catch(ResourceAccessException e) {
-//                BasicLogger.log(e.getMessage());
-//                System.out.println(e.getMessage());
-//            }
-//            return transfersByStatus;
-//        }
-
-
-// UNUSED
-//        public Transfer getTransferType(AuthenticatedUser authenticatedUser, String transferType) { //look at getting transfer status desc in controller method?
-//            HttpEntity entity = makeEntity(authenticatedUser);
-//            Transfer transfer = null;
-//            try {
-//                transfer = restTemplate.exchange(baseUrl + transferType, HttpMethod.GET, entity, Transfer.class).getBody();
-//            } catch (RestClientResponseException e) {
-//            System.out.println("Unable to display transfers. Error code: " + e.getRawStatusCode());
-//            BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
-//        } catch(ResourceAccessException e) {
-//            BasicLogger.log(e.getMessage());
-//            System.out.println(e.getMessage());
-//        }
-//            return transfer;
-//    }
-
-
-// UNUSED
-//        public void requestSendTransfer(AuthenticatedUser authenticatedUser) {
-//            HttpEntity entity = makeEntity(authenticatedUser);
-//            try {
-//                restTemplate.exchange(baseUrl + "request", HttpMethod.POST, entity, Transfer.class);
-//            } catch (RestClientResponseException e) {
-//                System.out.println("Unable to complete request. Error code: " + e.getRawStatusCode());
-//                BasicLogger.log(e.getMessage());
-//            } catch(ResourceAccessException e) {
-//                BasicLogger.log(e.getMessage());
-//                System.out.println(e.getMessage());
-//            }
-//        }
-
-
-//  - Replaced by using createTransfer for both directions
-//
-//        public void createRequestTransfer(AuthenticatedUser authenticatedUser, Long fromAccountId, Long toAccountId, BigDecimal amount) {
-//            Transfer transfer = new Transfer();
-//            transfer.setTransferTypeId(1);
-//            transfer.setTransferStatusId(1);
-//            transfer.setAccountFrom(fromAccountId);
-//            transfer.setAccountTo(toAccountId);
-//            transfer.setAmount(amount);
-//            HttpEntity<Transfer> entity = makeTransferEntity(authenticatedUser, transfer);
-//            try {
-//                restTemplate.exchange(baseUrl, HttpMethod.POST, entity, Boolean.class);
-//            } catch (RestClientResponseException e) {
-//                System.out.println("Unable to create transfer. Error code: " + e.getRawStatusCode());
-//                BasicLogger.log(e.getMessage());
-//            } catch(ResourceAccessException e) {
-//                BasicLogger.log(e.getMessage());
-//                System.out.println(e.getMessage());
-//            }
-//        }
 
 }
 
