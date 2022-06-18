@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -47,7 +48,7 @@ public class JdbcTransferDao implements TransferDao {
     }
 
     @Override // locating transfer by id
-    public Transfer findByTransferId(Long id) throws TransferIdDoesNotExistException {
+    public Transfer findByTransferId(Long id) {
         Transfer transfer = null;
         String sql = "SELECT * FROM transfer WHERE transfer_id = ?";
         SqlRowSet results = jdbcTemplate.queryForRowSet(sql, id);

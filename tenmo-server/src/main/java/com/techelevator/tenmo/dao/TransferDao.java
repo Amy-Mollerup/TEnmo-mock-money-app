@@ -12,7 +12,7 @@ public interface TransferDao {
 
     List<Transfer> findByAccountId(Long accountId);
 
-    Transfer findByTransferId(Long id) throws Exception;
+    Transfer findByTransferId(Long id);
 
     boolean createTransfer(Transfer transfer);
 

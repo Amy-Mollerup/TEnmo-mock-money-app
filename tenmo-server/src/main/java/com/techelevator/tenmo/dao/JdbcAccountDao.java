@@ -59,25 +59,6 @@ public class JdbcAccountDao implements AccountDao {
         return account1;
     }
 
-//    @Override
-//    public Account findById(long accountId) {
-//
-//        Account account = null;
-//        String sql = "SELECT * " +
-//                "FROM account " +
-//                "WHERE account_id = ?;";
-//        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, accountId);
-//        if (results.next()) {
-//            account = mapRowToAccount(results);
-//        }
-//        return account;
-//    }
-
-//    @Override
-//    public Long findUserIdByAccountId(Long accountId) {
-//        String sql = "SELECT user_id FROM account WHERE account_id = ?";
-//        return jdbcTemplate.queryForObject(sql, Long.class, accountId);
-//    }
 
     //added getBalance method so we can specifically pull just the balance from the account id, need to authenticate the
     //id belongs to the user and the user is authorized
@@ -109,19 +90,6 @@ public class JdbcAccountDao implements AccountDao {
         return newBal;
 
     }
-    /*@Override
-    //need update balance method -- initial account creation does not require balance, need to add at least 0 to account
-    //account_id serial?
-    //user id comes from when user is created, does there need to be a join statement here?
-    public Account create(Account newAccount) {
-        String create = "INSERT INTO account (user_id, balance) " +
-                "VALUES (?, ?) " +
-                "RETURNING account_id;";
-        long accountId = (jdbcTemplate.queryForObject(create, Long.class, newAccount.getUserId(), newAccount.getBalance()));
-        newAccount.setAccountId(accountId);
-        return newAccount;
-
-        }*/
 
 
     @Override //subtracts from balance in account, returns updated balance
@@ -144,6 +112,34 @@ public class JdbcAccountDao implements AccountDao {
         return newBal;
     }
 
+    private Account mapRowToAccount(SqlRowSet rowSet) {
+        Account account = new Account();
+        account.setAccountId(rowSet.getLong("account_id"));
+        account.setUserId(rowSet.getLong("user_id"));
+        account.setBalance(rowSet.getBigDecimal("balance"));
+        return account;
+    }
+
+//    @Override
+//    public Account findById(long accountId) {
+//
+//        Account account = null;
+//        String sql = "SELECT * " +
+//                "FROM account " +
+//                "WHERE account_id = ?;";
+//        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, accountId);
+//        if (results.next()) {
+//            account = mapRowToAccount(results);
+//        }
+//        return account;
+//    }
+
+//    @Override
+//    public Long findUserIdByAccountId(Long accountId) {
+//        String sql = "SELECT user_id FROM account WHERE account_id = ?";
+//        return jdbcTemplate.queryForObject(sql, Long.class, accountId);
+//    }
+
 //    @Override //will delete account as long as balance is at zero - do we need to include delete user too since create user includes delete?
 //    public void delete(long accountId, long userId) throws BalanceNotZeroException {
 //        String delete = "DELETE FROM account WHERE " +
@@ -155,11 +151,18 @@ public class JdbcAccountDao implements AccountDao {
 //            }
 //    }
 
-    private Account mapRowToAccount(SqlRowSet rowSet) {
-        Account account = new Account();
-        account.setAccountId(rowSet.getLong("account_id"));
-        account.setUserId(rowSet.getLong("user_id"));
-        account.setBalance(rowSet.getBigDecimal("balance"));
-        return account;
-    }
+        /*@Override
+    //need update balance method -- initial account creation does not require balance, need to add at least 0 to account
+    //account_id serial?
+    //user id comes from when user is created, does there need to be a join statement here?
+    public Account create(Account newAccount) {
+        String create = "INSERT INTO account (user_id, balance) " +
+                "VALUES (?, ?) " +
+                "RETURNING account_id;";
+        long accountId = (jdbcTemplate.queryForObject(create, Long.class, newAccount.getUserId(), newAccount.getBalance()));
+        newAccount.setAccountId(accountId);
+        return newAccount;
+
+        }*/
+
 }

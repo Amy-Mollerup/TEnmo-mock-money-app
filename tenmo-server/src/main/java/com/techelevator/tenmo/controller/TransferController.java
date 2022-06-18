@@ -40,16 +40,18 @@ public class TransferController {
     }
 
     @GetMapping("/{id}")//get transfer by id
-    public Transfer getTransferById(@PathVariable Long id) throws TransferIdDoesNotExistException {
-        Transfer transferByID = null;
-        try {
-            transferByID = transferDao.findByTransferId(id);
-        } catch (RestClientResponseException e) {
-            BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
-        } catch (Exception e) {
-            BasicLogger.log(e.getMessage());
-        }
-        return transferByID;
+    public Transfer getTransferById(@PathVariable Long id) {
+        return transferDao.findByTransferId(id);
+
+//        Transfer transferByID = null;
+//        try {
+//            transferByID = transferDao.findByTransferId(id);
+//        } catch (RestClientResponseException e) {
+//            BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
+//        } catch (Exception e) {
+//            BasicLogger.log(e.getMessage());
+//        }
+//        return transferByID;
     }
 
     @PostMapping()
