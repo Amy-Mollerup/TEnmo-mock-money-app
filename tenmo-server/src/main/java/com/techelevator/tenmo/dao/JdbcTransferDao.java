@@ -35,7 +35,6 @@ public class JdbcTransferDao implements TransferDao {
     }
 
     @Override
-    //we have a method in account that finds by userId
     public List<Transfer> findByAccountId(Long accountId) {
         List<Transfer> transfers = new ArrayList<>();
         String sql = "SELECT * FROM transfer WHERE account_from = ? OR account_to = ?;";
@@ -47,7 +46,7 @@ public class JdbcTransferDao implements TransferDao {
         return transfers;
     }
 
-    @Override //locating transfer by id
+    @Override // locating transfer by id
     public Transfer findByTransferId(Long id) throws TransferIdDoesNotExistException {
         Transfer transfer = null;
         String sql = "SELECT * FROM transfer WHERE transfer_id = ?";
@@ -59,9 +58,8 @@ public class JdbcTransferDao implements TransferDao {
     }
 
 
-    @Override //sending actual transfer to user
+    @Override // sending actual transfer to user
     public boolean createTransfer(Transfer transfer) {
-        // TODO update balances to reflect the amount transferred
         String sql = "INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount) " +
                 "VALUES (?, ?, ?, ?, ?)";
         boolean success = false;
@@ -79,7 +77,6 @@ public class JdbcTransferDao implements TransferDao {
 
     @Override //setting up our transfer requests from one user to another
     public boolean createRequestTransfer(Long accountFrom, Long accountTo, BigDecimal amount) {
-        // TODO update balances to reflect the amount transferred
         String sql = "INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount) " +
                 "VALUES (1, 1, ?, ?, ?)";
         boolean success = false;
@@ -122,6 +119,19 @@ public class JdbcTransferDao implements TransferDao {
             System.out.println("Error accessing data");
         }
         return transferStatus;
+
+    }
+
+    @Override
+    public List<Transfer> findPendingByAccountId(Long accountId) {
+        List<Transfer> pendingTransfers = new ArrayList<>();
+        String sql = "SELECT * FROM transfer WHERE account_from = ?;";
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, accountId);
+        while(results.next()) {
+            Transfer transfer = mapRowToTransfer(results);
+            pendingTransfers.add(transfer);
+        }
+        return pendingTransfers;
 
     }
 

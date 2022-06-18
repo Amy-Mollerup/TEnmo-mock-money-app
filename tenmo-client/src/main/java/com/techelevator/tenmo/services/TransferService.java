@@ -27,7 +27,6 @@ import java.util.List;
         }
 
         public void createSendTransfer(AuthenticatedUser authenticatedUser, Long fromAccountId, Long toAccountId, BigDecimal amount) {
-            //need to work more on this - not sure if it is set up correctly
             Transfer transfer = new Transfer();
             transfer.setTransferTypeId(2);
             transfer.setTransferStatusId(2);
@@ -46,10 +45,13 @@ import java.util.List;
             }
         }
 
-        public void updateTransferStatus(AuthenticatedUser authenticatedUser, Long transferId) {
-            HttpEntity entity = makeEntity(authenticatedUser);
+        public void updateTransferStatus(AuthenticatedUser authenticatedUser, Long transferId, int choice) {
+            choice++;
+            Transfer transfer = getTransferByTransferId(authenticatedUser, transferId);
+            transfer.setTransferStatusId(choice);
+            HttpEntity<Transfer> entity = makeTransferEntity(authenticatedUser, transfer);
             try {
-                restTemplate.exchange(baseUrl + transferId, HttpMethod.POST, entity, Transfer.class);
+                restTemplate.exchange(baseUrl + "/update/" + transfer.getTransferId(), HttpMethod.PUT, entity, Boolean.class);
             } catch (RestClientResponseException e) {
                 System.out.println("Unable to update transfer status. Error code: " + e.getRawStatusCode());
                 BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
@@ -85,6 +87,21 @@ import java.util.List;
                 System.out.println(e.getMessage());
             }
             return allTransfers;
+        }
+
+        public Transfer[] getAllPendingTransfersByAccountId(AuthenticatedUser authenticatedUser, Long accountId) {
+            HttpEntity entity = makeEntity(authenticatedUser);
+            Transfer[] allPendingTransfers = null;
+            try {
+                allPendingTransfers = restTemplate.exchange(baseUrl + "/pending/" + accountId, HttpMethod.GET, entity, Transfer[].class).getBody();
+            } catch (RestClientResponseException e) {
+                System.out.println("Unable to display pending transfers. Error code: " + e.getRawStatusCode());
+                BasicLogger.log(e.getMessage());
+            } catch(ResourceAccessException e) {
+                BasicLogger.log(e.getMessage());
+                System.out.println(e.getMessage());
+            }
+            return allPendingTransfers;
         }
 
         public Transfer getTransferByTransferId(AuthenticatedUser authenticatedUser, Long transferId) {
@@ -147,5 +164,25 @@ import java.util.List;
             headers.setBearerAuth(user.getToken());
             return new HttpEntity<>(transfer, headers);
     }
-}
+
+        public void createRequestTransfer(AuthenticatedUser authenticatedUser, Long fromAccountId, Long toAccountId, BigDecimal amount) {
+            Transfer transfer = new Transfer();
+            transfer.setTransferTypeId(1);
+            transfer.setTransferStatusId(1);
+            transfer.setAccountFrom(fromAccountId);
+            transfer.setAccountTo(toAccountId);
+            transfer.setAmount(amount);
+            HttpEntity<Transfer> entity = makeTransferEntity(authenticatedUser, transfer);
+            try {
+                restTemplate.exchange(baseUrl, HttpMethod.POST, entity, Boolean.class);
+            } catch (RestClientResponseException e) {
+                System.out.println("Unable to create transfer. Error code: " + e.getRawStatusCode());
+                BasicLogger.log(e.getMessage());
+            } catch(ResourceAccessException e) {
+                BasicLogger.log(e.getMessage());
+                System.out.println(e.getMessage());
+            }
+        }
+
+    }
 

@@ -41,7 +41,7 @@ public class UserService {
         HttpEntity entity = makeEntity(authenticatedUser);
         User user = null;
         try {
-            user = restTemplate.exchange(baseUrl + "/user/" + userId, HttpMethod.GET,
+            user = restTemplate.exchange(baseUrl + "/" + userId, HttpMethod.GET,
                     entity, User.class).getBody();
         } catch (RestClientResponseException e) {
             System.out.println("Unable to locate user. Error code: " + e.getRawStatusCode());
@@ -50,6 +50,22 @@ public class UserService {
             BasicLogger.log(e.getMessage());
             System.out.println(e.getMessage());
         }
+        return user;
+    }
+
+    public User getUserByAccountId(AuthenticatedUser authenticatedUser, Long accountId) {
+        HttpEntity<User> entity = makeEntity(authenticatedUser);
+        User user = new User();
+        try {
+            user = restTemplate.exchange(baseUrl + "/find/" + accountId, HttpMethod.GET, entity, User.class).getBody();
+        } catch (RestClientResponseException e) {
+            System.out.println("Unable to locate user. Error code: " + e.getRawStatusCode());
+            BasicLogger.log(e.getRawStatusCode() + " : " + e.getMessage());
+        } catch (ResourceAccessException e) {
+            BasicLogger.log(e.getMessage());
+            System.out.println(e.getMessage());
+        }
+        System.out.println(user.getUsername() +  user.getId());
         return user;
     }
 

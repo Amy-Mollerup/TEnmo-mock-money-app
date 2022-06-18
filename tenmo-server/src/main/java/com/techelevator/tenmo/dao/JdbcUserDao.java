@@ -79,6 +79,18 @@ public class JdbcUserDao implements UserDao {
         return true;
     }
 
+    @Override
+    public User findUserByAccountId(Long accountId) {
+        User user = null;
+        String sql = "SELECT * FROM account NATURAL JOIN tenmo_user " +
+                "WHERE account_id = ?;";
+        SqlRowSet rowSet = jdbcTemplate.queryForRowSet(sql, accountId);
+        if (rowSet.next()) {
+            user = mapRowToUser(rowSet);
+        }
+        return user;
+    }
+
     private User mapRowToUser(SqlRowSet rs) {
         User user = new User();
         user.setId(rs.getLong("user_id"));

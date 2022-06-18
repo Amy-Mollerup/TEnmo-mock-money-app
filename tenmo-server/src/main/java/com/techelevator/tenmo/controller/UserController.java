@@ -31,6 +31,11 @@ public class UserController {
         return dao.findAll();
     }
 
+    @GetMapping("/find/{accountId}")
+    public User findUserByAccountId(@PathVariable Long accountId) {
+        return dao.findUserByAccountId(accountId);
+    }
+
     @GetMapping("/{username}")
     //works in postman
     public User findUserByUsername(@PathVariable String username) {

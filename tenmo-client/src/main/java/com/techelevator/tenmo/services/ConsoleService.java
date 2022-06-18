@@ -107,7 +107,7 @@ public class ConsoleService {
     public void printUsers(AuthenticatedUser authenticatedUser) {
         printHeaders("Users", "Name", false);
         User[] allUsers = userService.getAllUsers(authenticatedUser);
-        for(User user : allUsers) {
+        for (User user : allUsers) {
             System.out.printf(columnFormat + "\n", user.getId(), user.getUsername());
         }
         System.out.println("---------");
@@ -116,7 +116,7 @@ public class ConsoleService {
     public void printHeaders(String menuTitle, String field2, boolean amount) {
         System.out.println(dashes);
         System.out.println(menuTitle);
-        if(amount) {
+        if (amount) {
             String newFormat = columnFormat + "%s" + "\n";
             System.out.printf(newFormat, "ID", field2, "amount");
         } else {
@@ -126,32 +126,62 @@ public class ConsoleService {
     }
 
     public void printPendingRequests(AuthenticatedUser authenticatedUser) {
-        //just need to clean up aesthetic formatting
-        printHeaders("Pending Transfers", "To", true );
-        Account accountByUserId = accountService.getAccountByUserId(authenticatedUser, authenticatedUser.getUser().getId());
-        long accountId = accountByUserId.getAccountId();
-        Transfer[] transfers = transferService.getAllTransfersByAccountId(authenticatedUser, accountId);
-        for(Transfer t : transfers) {
-            if(t.getTransferStatusId() != 1) {
-                System.out.println("No pending transfers.");
-                break;
-            } else {
-                System.out.printf(columnFormat + "%s" + "\n", t.getTransferStatusId(), t.getAccountTo(), t.getAmount().toString());
+        // TODO works, need to get username instead of accountID for TO column
+        printHeaders("Pending Transfers", "To", true);
+        long accountId = accountService.getAccountByUserId(authenticatedUser, authenticatedUser.getUser().getId()).getAccountId();
+        Transfer[] transfers = transferService.getAllPendingTransfersByAccountId(authenticatedUser, accountId);
+        for (Transfer t : transfers) {
+                System.out.printf(columnFormat + "%s" + "\n", t.getTransferId(), t.getAccountTo(), t.getAmount().toString());
             }
-        }
     }
 
     public void printTransferHistory(AuthenticatedUser authenticatedUser) {
-        //amount needs to be corrected - pulling wrong data
         printHeaders("Transfer History", "From/To", true);
         Account accountByUserId = accountService.getAccountByUserId(authenticatedUser, authenticatedUser.getUser().getId());
         long accountId = accountByUserId.getAccountId();
         Transfer[] transfers = transferService.getAllTransfersByAccountId(authenticatedUser, accountId);
-        for(Transfer t : transfers) {
-            System.out.printf(columnFormat + "%s" + "\n", t.getTransferId(), t.getAccountFrom(), t.getAccountTo(), t.getAmount().toString());
+        for (Transfer t : transfers) {
+            if (t.getTransferTypeId() == 1) {
+                System.out.printf(columnFormat + "%s" + "\n", t.getTransferId(), "From: " + t.getAccountFrom(), t.getAmount().toString());
+            } else {
+                System.out.printf(columnFormat + "%s" + "\n", t.getTransferId(), "To:   " + t.getAccountTo(), t.getAmount().toString());
+            }
+        }
+
+
+    }
+
+    public String transferUpdateChoiceMenu() {
+        return "1: Approve\n" +
+                "2: Reject\n" +
+                "0: Don't approve or reject";
+    }
+
+    public String transferDetails(AuthenticatedUser authenticatedUser, Transfer transfer) {
+        String transferId = transfer.getTransferId().toString();
+        String accountFrom = userService.getUserByAccountId(authenticatedUser, transfer.getAccountFrom()).getUsername();
+        String accountTo = userService.getUserByAccountId(authenticatedUser, transfer.getAccountTo()).getUsername();
+        String transferTypeDescription = null;
+        if(transfer.getTransferTypeId() == 1) {
+            transferTypeDescription = "Request";
+        } else if (transfer.getTransferTypeId() == 2) {
+            transferTypeDescription = "Send";
+        }
+        String transferStatusDescription = null;
+        if(transfer.getTransferStatusId() == 1 ) {
+            transferStatusDescription = "Pending";
+        } else if(transfer.getTransferStatusId() == 2) {
+            transferStatusDescription = "Approved";
+        } else if(transfer.getTransferStatusId() == 3) {
+            transferStatusDescription = "Rejected";
+        }
+        String amount = transfer.getAmount().toString();
+            return "\nID: " + transferId +
+                    "\nFrom: " + accountFrom +
+                    "\nTo: " + accountTo +
+                    "\nType: " + transferTypeDescription +
+                    "\nStatus: " + transferStatusDescription +
+                    "\nAmount: $" + amount;
         }
     }
 
-
-
-}

@@ -2,6 +2,7 @@ package com.techelevator.tenmo;
 
 import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.AuthenticatedUser;
+import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.UserCredentials;
 import com.techelevator.tenmo.services.*;
 
@@ -95,13 +96,19 @@ public class App {
 
 	private void viewTransferHistory() {
 		consoleService.printTransferHistory(currentUser);
-        //add prompt to view details based off ID
-		
+        Long transferId = (long) consoleService.promptForInt("Please enter Transfer ID to view details (0 to cancel): ");
+        Transfer transfer = transferService.getTransferByTransferId(currentUser, transferId);
+        System.out.println(consoleService.transferDetails(currentUser, transfer));
+
 	}
 
 	private void viewPendingRequests() {
         consoleService.printPendingRequests(currentUser);
-        //add approve and reject capabilities
+        Long transferID = (long) consoleService.promptForInt("Please enter transfer ID to approve/reject (0 to cancel): ");
+        System.out.println(consoleService.transferUpdateChoiceMenu());
+        int choice = consoleService.promptForInt("Please choose an option: ");
+        transferService.updateTransferStatus(currentUser, transferID, choice);
+
 		
 	}
 
@@ -117,8 +124,14 @@ public class App {
 	}
 
 	private void requestBucks() {
-		// TODO Auto-generated method stub
-		
+		consoleService.printUsers(currentUser);
+
+        Long fromUserId = (long) consoleService.promptForInt("Enter ID of user you are requesting from (0 to cancel): ");
+        Long fromAccountId = accountService.getAccountByUserId(currentUser, fromUserId).getAccountId();
+        Long toAccountId = accountService.getAccountByUserId(currentUser, currentUser.getUser().getId()).getAccountId();
+        BigDecimal amount = consoleService.promptForBigDecimal("Enter amount: ");
+
+        transferService.createRequestTransfer(currentUser, fromAccountId, toAccountId, amount);
 	}
 
 }

@@ -12,3 +12,11 @@
 2022-06-17T13:05:34.7810726 500 : [{"timestamp":"2022-06-17T19:05:34.766+00:00","status":500,"error":"Internal Server Error","message":"Cannot invoke \"java.math.BigDecimal.subtract(java.math.BigDecimal)\" because the return value of \"com.techelevator.tenmo.dao.JdbcAccountDao.getBalance(long)\" is null","path":"/transfer/send"}]
 2022-06-17T13:20:58.678502 500 : [{"timestamp":"2022-06-17T19:20:58.661+00:00","status":500,"error":"Internal Server Error","message":"Cannot invoke \"java.math.BigDecimal.add(java.math.BigDecimal)\" because the return value of \"com.techelevator.tenmo.dao.JdbcAccountDao.getBalance(long)\" is null","path":"/transfer/send"}]
 2022-06-17T14:18:32.5281264 405 : [{"timestamp":"2022-06-17T20:18:32.508+00:00","status":405,"error":"Method Not Allowed","message":"Request method 'POST' not supported","path":"/transfer/send"}]
+2022-06-17T17:29:56.7428567 401 : 401 : [{"timestamp":"2022-06-17T23:29:56.627+00:00","status":401,"error":"Unauthorized","message":"User 2001 was not found.","path":"/user/2001"}]
+2022-06-17T17:31:44.4510659 500 : 500 : [{"timestamp":"2022-06-17T23:31:44.395+00:00","status":500,"error":"Internal Server Error","message":"Ambiguous handler methods mapped for '/user/2001': {public com.techelevator.tenmo.model.User com.te... (429 bytes)]
+2022-06-17T17:34:08.2315175 500 : 500 : [{"timestamp":"2022-06-17T23:34:08.179+00:00","status":500,"error":"Internal Server Error","message":"Ambiguous handler methods mapped for '/user/2004': {public com.techelevator.tenmo.model.User com.te... (429 bytes)]
+2022-06-17T17:51:11.1515997 500 : [{"timestamp":"2022-06-17T23:51:11.107+00:00","status":500,"error":"Internal Server Error","message":"Cannot invoke \"java.math.BigDecimal.subtract(java.math.BigDecimal)\" because the return value of \"com.techelevator.tenmo.dao.JdbcAccountDao.getBalance(long)\" is null","path":"/transfer/"}]
+2022-06-17T17:55:20.3363261 500 : [{"timestamp":"2022-06-17T23:55:20.333+00:00","status":500,"error":"Internal Server Error","message":"Cannot invoke \"java.math.BigDecimal.subtract(java.math.BigDecimal)\" because the return value of \"com.techelevator.tenmo.dao.JdbcAccountDao.getBalance(long)\" is null","path":"/transfer/"}]
+2022-06-17T18:53:19.2984028 400 : 
+2022-06-17T18:53:46.670755 400 : 
+2022-06-17T18:56:34.4685657 400 : 

@@ -20,4 +20,6 @@ public interface TransferDao {
     boolean updateTransferStatus(Long transferId, int transferStatusId);
 
     String getTransferStatus(Long transferId);
+
+    List<Transfer> findPendingByAccountId(Long accountId); //account from id
 }

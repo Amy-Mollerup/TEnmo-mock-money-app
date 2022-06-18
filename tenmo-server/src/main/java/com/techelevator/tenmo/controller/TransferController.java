@@ -34,8 +34,12 @@ public class TransferController {
         return transferDao.findByAccountId(id);
     }
 
+    @GetMapping("pending/{accountId}")
+    public List<Transfer> getPendingTransfersByAccountId(@PathVariable Long accountId) {
+        return transferDao.findPendingByAccountId(accountId);
+    }
+
     @GetMapping("/{id}")//get transfer by id
-    //sort of works?? Only returns literally the transfer id
     public Transfer getTransferById(@PathVariable Long id) throws TransferIdDoesNotExistException {
         Transfer transferByID = null;
         try {
@@ -49,7 +53,6 @@ public class TransferController {
     }
 
     @PostMapping()
-    //works in postman - does not return transfer id
     public boolean createTransfer(@RequestBody Transfer transfer) {
         Long accountFrom = transfer.getAccountFrom();
         Long accountTo = transfer.getAccountTo();
@@ -69,43 +72,17 @@ public class TransferController {
         }
         return success;
     }
-/*
-
-    @PostMapping("/request")
-    //works in postman, I think
-    public boolean createRequestTransfer(@RequestBody String transfer) {
-        String[] paramList = transfer.split(",");
-        Long accountFrom = Long.valueOf(paramList[0]);
-        Long accountTo = Long.valueOf(paramList[1]);
-        BigDecimal amount = BigDecimal.valueOf(Double.parseDouble(paramList[2]));
-
-        boolean success = false;
-        try {
-            transferDao.createRequestTransfer(accountFrom, accountTo, amount);
-            success = true;
-        } catch (RestClientResponseException e) {
-            BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
-        }
-        catch (ResourceAccessException e) {
-            BasicLogger.log(e.getMessage());
-        }
-        return success;
-    }*/
 
     @PutMapping("/update/{transferId}")
-    //client side -- add logic for transferStatusId input
-    public boolean updateTransferStatus(@RequestBody int transferStatusId, @PathVariable Long transferId) throws Exception {
+    public boolean updateTransferStatus(@RequestBody Transfer transfer, @PathVariable Long transferId) throws Exception {
         boolean success = false;
-        Transfer transfer = transferDao.findByTransferId(transferId);
 
         try {
-            if (transferStatusId == 2) {
+            if (transfer.getTransferStatusId() == 2) {
                 accountDao.withdraw(transfer.getAccountFrom(), transfer.getAmount());
-                //if withdraw fails, we need to update the status to rejected
                 accountDao.deposit(transfer.getAccountTo(), transfer.getAmount());
             }
-            //if withdraw + deposit are both successful, update status accordingly
-            transferDao.updateTransferStatus(transferId, transferStatusId);
+            transferDao.updateTransferStatus(transferId, transfer.getTransferStatusId());
             success = true;
         }
         catch (RestClientResponseException e) {

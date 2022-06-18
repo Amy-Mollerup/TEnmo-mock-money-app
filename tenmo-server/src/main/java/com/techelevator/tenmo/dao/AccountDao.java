@@ -21,7 +21,7 @@ public interface AccountDao {
     // Finds full account information by Account ID
     Account findById(long accountId);
 
-    //Long findUserIdByAccountId(Long accountId);
+
 
     BigDecimal getBalance(long accountId) throws UserNotAuthorizedException;
     //user needs to be authorized to view balance
