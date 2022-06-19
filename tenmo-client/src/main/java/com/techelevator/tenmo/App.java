@@ -148,13 +148,18 @@ public class App {
 
     // Created to make code more DRY
     private void handleCreateTransfer(String transferType, long secondUserId) {
+        boolean success = false;
         long secondPartyAccountId = accountService.getAccountByUserId(currentUser, secondUserId).getAccountId();
         BigDecimal amount = consoleService.promptForBigDecimal("Enter amount: ");
-
         if(transferType.equals("Send")) {
-            transferService.createTransfer(currentUser, 2, userAccountId, secondPartyAccountId, amount);
+            success = transferService.createTransfer(currentUser, 2, userAccountId, secondPartyAccountId, amount);
         } else if(transferType.equals("Request")) {
-            transferService.createTransfer(currentUser, 1, secondPartyAccountId, userAccountId, amount);
+           success = transferService.createTransfer(currentUser, 1, secondPartyAccountId, userAccountId, amount);
+        }
+        if(success) {
+            System.out.println("Transfer successfully created.");
+        } else {
+            consoleService.printErrorMessage();
         }
     }
 

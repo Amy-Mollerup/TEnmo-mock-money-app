@@ -1,14 +1,23 @@
 package com.techelevator.tenmo.model;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 import java.math.BigDecimal;
 
 public class Transfer {
 
+    @NotNull
     private Long transferId;
+    @NotEmpty
     private String transferType;
+    @NotEmpty
     private String transferStatus;
+    @NotEmpty
     private String accountFrom;
+    @NotEmpty
     private String accountTo;
+    @Positive(message = "Balance must be greater than 0.")
     private BigDecimal amount;
 
     public Transfer() {

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -20,13 +21,11 @@ public class UserController {
     public UserController(UserDao dao) { this.dao = dao; }
 
     @GetMapping("/id/{username}")
-    //works in postman
     public int findIdByUsername(@PathVariable String username) {
         return dao.findIdByUsername(username);
     }
 
     @GetMapping()
-    //works in postman
     public List<User> list() {
         return dao.findAll();
     }
@@ -37,14 +36,12 @@ public class UserController {
     }
 
     @GetMapping("/{username}")
-    //works in postman
     public User findUserByUsername(@PathVariable String username) {
         return dao.findByUsername(username);
     }
 
     @PostMapping("/create")
-    //works in postman
-    public void createUser(@RequestBody User user) {
+    public void createUser(@Valid @RequestBody User user) {
         dao.create(user.getUsername(), user.getPassword());
     }
 

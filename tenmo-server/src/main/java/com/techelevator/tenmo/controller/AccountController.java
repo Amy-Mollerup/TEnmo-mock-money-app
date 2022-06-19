@@ -35,24 +35,4 @@ public class AccountController {
     }
 
 
-/*
-    */
-/* Deposit and Withdraw may be unnecessary endpoints. The methods are used by TransferController, through the Dao,
-     but the endpoints are never used by the client
-    *//*
-
-
-    @PutMapping("/{accountId}/deposit")
-    public BigDecimal deposit(@PathVariable long accountId, @RequestBody String amount) {
-        return accountDao.deposit(accountId, BigDecimal.valueOf(Double.parseDouble(amount)));
-    }
-
-    @PutMapping("/{accountId}/withdraw")
-    public BigDecimal withdraw(@PathVariable long accountId, @RequestBody String amount) {
-        return accountDao.withdraw(accountId, BigDecimal.valueOf(Double.parseDouble(amount)));
-    }
-
-
-*/
-
 }

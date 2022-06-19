@@ -22,9 +22,6 @@ public class AccountService {
 
     public AccountService(String url) { this.baseUrl = url + "account/"; }
 
-    /* TODO reevaluate how authorization is handled,
-        possibly remove custom Exceptions for unauthorized users and use only what's built in (Client and server side)
-    */
     public BigDecimal getBalance(AuthenticatedUser authenticatedUser) {
         Account account = getAccountByUserId(authenticatedUser, authenticatedUser.getUser().getId());
         HttpEntity<Void> entity = makeEntity(authenticatedUser);

@@ -1,11 +1,18 @@
 package com.techelevator.tenmo.model;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import java.math.BigDecimal;
 
 public class TransferDTO {
 
+
     private Long transferId;
+    @Min(value = 1)
+    @Max(value = 2)
     private int transferTypeId;
+    @Min(value = 1)
+    @Max(value = 3)
     private int transferStatusId;
     private Long accountFrom;
     private Long accountTo;
