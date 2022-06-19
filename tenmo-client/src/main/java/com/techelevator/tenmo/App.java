@@ -2,11 +2,11 @@ package com.techelevator.tenmo;
 
 import com.techelevator.tenmo.model.AuthenticatedUser;
 import com.techelevator.tenmo.model.Transfer;
-import com.techelevator.tenmo.model.TransferDto;
 import com.techelevator.tenmo.model.UserCredentials;
 import com.techelevator.tenmo.services.*;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 public class App {
 
@@ -103,7 +103,7 @@ public class App {
 	}
 
 	private void viewTransferHistory() {
-        Transfer[] transfers = transferService.getAllTransfersByAccountId(currentUser, userAccountId);
+        Map<Long, Transfer> transfers = transferService.getAllTransfersByAccountId(currentUser, userAccountId);
 		consoleService.printTransferHistory(transfers);
         long transferId = consoleService.promptForInt("Please enter Transfer ID to view details (0 to cancel): ");
         if (transferId != 0) {
@@ -113,14 +113,29 @@ public class App {
 	}
 
 	private void viewPendingRequests() {
-        Transfer[] transfers = transferService.getAllTransfersByAccountId(currentUser, userAccountId);
+        boolean success = false;
+        Map<Long, Transfer> transfers = transferService.getAllTransfersByAccountId(currentUser, userAccountId);
         consoleService.printPendingRequests(transfers, currentUser.getUser().getUsername());
         long transferID = consoleService.promptForInt("Please enter transfer ID to approve/reject (0 to cancel): ");
         if (transferID != 0) {
-            consoleService.printTransferUpdateChoiceMenu();
-            int choice = consoleService.promptForInt("Please choose an option: ");
-            if(choice != 0) {
-                transferService.updateTransferStatus(currentUser, transferID, choice);
+            boolean valid = false;
+            while(!valid) {
+                if (transfers.containsKey(transferID)) {
+                     valid = true;
+                    consoleService.printTransferUpdateChoiceMenu();
+                    int choice = consoleService.promptForInt("Please choose an option: ");
+                    if (choice != 0) {
+                        success = transferService.updateTransferStatus(currentUser, transferID, choice);
+                    }
+                    if (!success) {
+                        consoleService.printErrorMessage();
+                    }
+                } else {
+                    consoleService.printErrorMessage();
+                } transferID = consoleService.promptForInt("Please enter transfer ID to approve/reject (0 to cancel): ");
+                if(transferID == 0) {
+                    valid = false;
+                }
             }
         }
 		

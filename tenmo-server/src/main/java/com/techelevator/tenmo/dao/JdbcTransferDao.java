@@ -80,17 +80,19 @@ public class JdbcTransferDao implements TransferDao {
 
     @Override
     public boolean updateTransferStatus(TransferDTO transferDTO) {
+        int lines = 0;
         String sql = "UPDATE transfer SET transfer_status_id = ?" +
                 "WHERE transfer_id = ?;";
         boolean success = false;
-        try {
-            jdbcTemplate.update(sql, transferDTO.getTransferStatusId(), transferDTO.getTransferId());
-            if (transferDTO.getTransferStatusId() == 2) {
-                executeTransfer(transferDTO);
-            }
-            success = true;
-        } catch (DataAccessException e) {
+        lines = jdbcTemplate.update(sql, transferDTO.getTransferStatusId(), transferDTO.getTransferId());
+        if(lines == 0) {
             throw new TransferIdDoesNotExistException();
+        }
+        if (transferDTO.getTransferStatusId() == 2) {
+            executeTransfer(transferDTO);
+            success = true;
+        } else if (transferDTO.getTransferStatusId() == 3) {
+            success = true;
         }
         return success;
     }
@@ -128,8 +130,8 @@ public class JdbcTransferDao implements TransferDao {
     }
 
     public void executeTransfer(TransferDTO transferDTO) {
-        accountDao.withdraw(transferDTO.getAccountFrom(), transferDTO.getAmount());
-        accountDao.deposit(transferDTO.getAccountTo(), transferDTO.getAmount());
+            accountDao.withdraw(transferDTO.getAccountFrom(), transferDTO.getAmount());
+            accountDao.deposit(transferDTO.getAccountTo(), transferDTO.getAmount());
     }
 
 

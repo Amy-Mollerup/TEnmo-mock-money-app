@@ -4,6 +4,7 @@ package com.techelevator.tenmo.services;
 import com.techelevator.tenmo.model.*;
 
 import java.math.BigDecimal;
+import java.util.Map;
 import java.util.Scanner;
 
 public class ConsoleService {
@@ -123,9 +124,9 @@ public class ConsoleService {
         System.out.println(dashes);
     }
 
-    public void printPendingRequests(Transfer[] transfers, String username) {
+    public void printPendingRequests(Map<Long, Transfer> transfers, String username) {
         printHeaders("Pending Transfers", "To", true);
-        for (Transfer t : transfers) {
+        for (Transfer t : transfers.values()) {
             if (t.getTransferStatus().equals("Pending") && t.getAccountFrom().equals(username)) {
                 System.out.printf(largeColumnFormat, t.getTransferId(), t.getAccountTo(), t.getAmount().toString());
             }
@@ -133,9 +134,9 @@ public class ConsoleService {
     }
 
 
-    public void printTransferHistory(Transfer[] transfers) {
+    public void printTransferHistory(Map<Long, Transfer> transfers) {
         printHeaders("Transfer History", "From/To", true);
-        for (Transfer t : transfers) {
+        for (Transfer t : transfers.values()) {
             if(!t.getTransferStatus().equals("Pending")) {
                 if (t.getTransferType().equals("Request")) {
                     System.out.printf(largeColumnFormat, t.getTransferId(), "From: " + t.getAccountFrom(), t.getAmount().toString());
