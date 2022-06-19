@@ -1,0 +1,5 @@
+2022-06-18T16:19:52.4548895 I/O error on POST request for "http://localhost:8080/login": Connection refused: connect; nested exception is java.net.ConnectException: Connection refused: connect
+2022-06-18T16:20:25.8911012 500 : [{"timestamp":"2022-06-18T22:20:25.877+00:00","status":500,"error":"Internal Server Error","message":"Missing URI template variable 'transferId' for method parameter of type Long","path":"/transfer/getinfo/3064"}]
+2022-06-18T16:21:13.2395571 500 : [{"timestamp":"2022-06-18T22:21:13.227+00:00","status":500,"error":"Internal Server Error","message":"Missing URI template variable 'transferId' for method parameter of type Long","path":"/transfer/getinfo/3064"}]
+2022-06-18T17:14:13.4114009 406 : [{"timestamp":"2022-06-18T23:14:13.396+00:00","status":406,"error":"Not Acceptable","message":"Amount to transfer exceeds available funds","path":"/transfer/"}]
+2022-06-18T17:15:54.8394097 406 : [{"timestamp":"2022-06-18T23:15:54.828+00:00","status":406,"error":"Not Acceptable","message":"Amount to transfer exceeds available funds","path":"/transfer/update/3074"}]
