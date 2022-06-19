@@ -12,6 +12,9 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class UserService {
 
     private final RestTemplate restTemplate = new RestTemplate();
@@ -22,15 +25,23 @@ public class UserService {
         this.baseUrl = url + "/user";
     }
 
-    public User[] getAllUsers(AuthenticatedUser authenticatedUser) {
-        HttpEntity entity = makeEntity(authenticatedUser);
+    public Map<Long, User> getAllUsers(AuthenticatedUser authenticatedUser) {
+        Map<Long, User> userMap = new HashMap<>();
+        HttpEntity<Void> entity = makeEntity(authenticatedUser);
         User[] allUsers = null;
         try {
             allUsers = restTemplate.exchange(baseUrl, HttpMethod.GET, entity, User[].class).getBody();
+            if (allUsers != null) {
+                for (User user : allUsers) {
+                    if (!user.getId().equals(authenticatedUser.getUser().getId())) {
+                        userMap.put(user.getId(), user);
+                    }
+                }
+            }
         } catch (RestClientResponseException | ResourceAccessException e) {;
             BasicLogger.log(e.getMessage());
         }
-        return allUsers;
+        return userMap;
     }
 
     public User getUserByUserId(AuthenticatedUser authenticatedUser, Long userId) {

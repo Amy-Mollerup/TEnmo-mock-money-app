@@ -2,10 +2,12 @@ package com.techelevator.tenmo;
 
 import com.techelevator.tenmo.model.AuthenticatedUser;
 import com.techelevator.tenmo.model.Transfer;
+import com.techelevator.tenmo.model.User;
 import com.techelevator.tenmo.model.UserCredentials;
 import com.techelevator.tenmo.services.*;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.Map;
 
 public class App {
@@ -17,6 +19,8 @@ public class App {
     private final AccountService accountService = new AccountService(API_BASE_URL);
     private final UserService userService = new UserService(API_BASE_URL);
     private final TransferService transferService = new TransferService(API_BASE_URL);
+
+    private Map<Long, User> allUsers = new HashMap<>();
 
     private AuthenticatedUser currentUser;
     private long userAccountId;
@@ -63,9 +67,11 @@ public class App {
     private void handleLogin() {
         UserCredentials credentials = consoleService.promptForCredentials();
         currentUser = authenticationService.login(credentials);
-        userAccountId = accountService.getAccountByUserId(currentUser, currentUser.getUser().getId()).getAccountId();
         if (currentUser == null) {
             consoleService.printErrorMessage();
+        } else {
+            userAccountId = accountService.getAccountByUserId(currentUser, currentUser.getUser().getId()).getAccountId();
+            allUsers = userService.getAllUsers(currentUser);
         }
     }
 
@@ -108,56 +114,71 @@ public class App {
         long transferId = consoleService.promptForInt("Please enter Transfer ID to view details (0 to cancel): ");
         if (transferId != 0) {
             Transfer transfer = transferService.getTransferByTransferId(currentUser, transferId);
-            System.out.println(transfer);
+            consoleService.printTransferDetails(transfer);
         }
 	}
 
-	private void viewPendingRequests() {
-        boolean success = false;
+    private void viewPendingRequests() {
+        long transferId;
         Map<Long, Transfer> transfers = transferService.getAllTransfersByAccountId(currentUser, userAccountId);
+
         consoleService.printPendingRequests(transfers, currentUser.getUser().getUsername());
-        long transferID = consoleService.promptForInt("Please enter transfer ID to approve/reject (0 to cancel): ");
-        if (transferID != 0) {
-            boolean valid = false;
-            while(!valid) {
-                if (transfers.containsKey(transferID)) {
-                     valid = true;
-                    consoleService.printTransferUpdateChoiceMenu();
-                    int choice = consoleService.promptForInt("Please choose an option: ");
-                    if (choice != 0) {
-                        success = transferService.updateTransferStatus(currentUser, transferID, choice);
-                    }
-                    if (!success) {
-                        consoleService.printErrorMessage();
-                    }
-                } else {
-                    consoleService.printErrorMessage();
-                } transferID = consoleService.promptForInt("Please enter transfer ID to approve/reject (0 to cancel): ");
-                if(transferID == 0) {
-                    valid = false;
-                }
+        transferId = consoleService.promptForInt("Please enter transfer ID to approve/reject (0 to cancel): ");
+        if(transferId != 0) {
+            if (transfers.containsKey(transferId)) {
+                handleUpdateTransfer(transferId);
+            } else {
+                consoleService.printReprompt(transferId);
+                viewPendingRequests();
             }
         }
-		
-	}
+    }
 
-	private void sendBucks() {
-        consoleService.printUsers(userService.getAllUsers(currentUser));
-        long toUserId = consoleService.promptForInt("Enter ID of user you are sending to (0 to cancel): ");
-        if (toUserId != 0) {
-            handleCreateTransfer("Send", toUserId);
+    private void handleUpdateTransfer(long transferId) {
+        consoleService.printTransferUpdateChoiceMenu();
+        int choice = consoleService.promptForInt("Please choose an option: ");
+
+        if(choice == 1 || choice == 2) {
+            boolean success = transferService.updateTransferStatus(currentUser, transferId, choice);
+
+            if (success) {
+                System.out.println("Transfer successfully updated");
+            } else {
+                consoleService.printErrorMessage();
+            }
+
+        } else if (choice != 0) {
+            consoleService.printReprompt((long)choice);
+            handleUpdateTransfer(transferId);
         } else {
-            consoleService.printErrorMessage();
+            viewPendingRequests();
+        }
+    }
+
+
+    private void sendBucks() {
+        consoleService.printUsers(allUsers);
+        long toUserId = consoleService.promptForInt("Enter ID of user you are sending to (0 to cancel): ");
+        if(toUserId != 0) {
+            if (allUsers.containsKey(toUserId)) {
+                handleCreateTransfer("Send", toUserId);
+            } else {
+                consoleService.printReprompt(toUserId);
+                sendBucks();
+            }
         }
 	}
 
 	private void requestBucks() {
-		consoleService.printUsers(userService.getAllUsers(currentUser));
+		consoleService.printUsers(allUsers);
         long fromUserId = consoleService.promptForInt("Enter ID of user you are requesting from (0 to cancel): ");
-        if (fromUserId != 0) {
-            handleCreateTransfer("Request", fromUserId);
-        } else {
-            consoleService.printErrorMessage();
+        if(fromUserId != 0) {
+            if (allUsers.containsKey(fromUserId)) {
+                handleCreateTransfer("Request", fromUserId);
+            } else {
+                consoleService.printReprompt(fromUserId);
+                requestBucks();
+            }
         }
 	}
 

@@ -48,7 +48,7 @@ public class JdbcTransferDao implements TransferDao {
 
     @Override // locating transfer by id
     public TransferDTO findByTransferId(Long id) {
-        TransferDTO transferDTO = null;
+        TransferDTO transferDTO;
         String sql = "SELECT * FROM transfer WHERE transfer_id = ?";
         SqlRowSet results = jdbcTemplate.queryForRowSet(sql, id);
         if (results.next()) {

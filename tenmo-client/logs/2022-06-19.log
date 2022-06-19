@@ -16,3 +16,8 @@
 2022-06-19T14:14:02.6353867 400 : [{"timestamp":"2022-06-19T20:14:02.600+00:00","status":400,"error":"Bad Request","message":"Insufficient funds","path":"/transfer/update"}]
 2022-06-19T14:15:31.795535 400 : [{"timestamp":"2022-06-19T20:15:31.763+00:00","status":400,"error":"Bad Request","message":"Transfer ID does not exist","path":"/transfer/3215"}]
 2022-06-19T14:43:23.3857312 I/O error on POST request for "http://localhost:8080/login": Connection refused: connect; nested exception is java.net.ConnectException: Connection refused: connect
+2022-06-19T15:02:34.5394725 I/O error on POST request for "http://localhost:8080/login": Connection refused: connect; nested exception is java.net.ConnectException: Connection refused: connect
+2022-06-19T15:02:50.8388159 401 : [no body]
+2022-06-19T15:04:23.2078999 401 : [no body]
+2022-06-19T15:04:41.1956757 401 : [no body]
+2022-06-19T15:05:24.0581001 401 : [no body]

@@ -105,9 +105,9 @@ public class ConsoleService {
             System.out.println("Your current account balance is: " + balance);
     }
 
-    public void printUsers(User[] allUsers) {
+    public void printUsers(Map<Long, User> allUsers) {
         printHeaders("Users", "Name", false);
-        for(User user : allUsers) {
+        for(User user : allUsers.values()) {
             System.out.printf(smallColumnFormat, user.getId(), user.getUsername());
         }
         System.out.println("---------");
@@ -145,8 +145,18 @@ public class ConsoleService {
                 }
             }
         }
+    }
 
+    public void printTransferDetails(Transfer transfer) {
+        System.out.println(dashes);
+        System.out.println("Transfer Details");
+        System.out.println(dashes);
+        System.out.println(transfer);
+    }
 
+    public void printReprompt(Long choice) {
+        System.out.println(choice + " is not a valid option, please try again.");
+        pause();
     }
 }
 
