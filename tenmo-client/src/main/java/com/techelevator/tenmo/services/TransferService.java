@@ -24,7 +24,8 @@ public class TransferService {
             this.baseUrl = url + "transfer/";
         }
 
-        public void createTransfer(AuthenticatedUser authenticatedUser, int transferTypeID, Long fromAccountId, Long toAccountId, BigDecimal amount) {
+        public boolean createTransfer(AuthenticatedUser authenticatedUser, int transferTypeID, Long fromAccountId, Long toAccountId, BigDecimal amount) {
+            boolean success = false;
             TransferDto transferDto = new TransferDto();
             transferDto.setTransferTypeId(transferTypeID);
             transferDto.setTransferStatusId(transferTypeID);
@@ -35,9 +36,10 @@ public class TransferService {
             HttpEntity<TransferDto> entity = makeTransferEntity(authenticatedUser, transferDto);
             try {
                 restTemplate.exchange(baseUrl, HttpMethod.POST, entity, Boolean.class);
+                success = true;
             } catch (RestClientResponseException | ResourceAccessException e) {;
                 BasicLogger.log(e.getMessage());
-            }
+            } return success;
         }
 
         public void updateTransferStatus(AuthenticatedUser authenticatedUser, Long transferId, int choice) {

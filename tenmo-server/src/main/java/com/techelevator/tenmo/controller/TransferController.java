@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -36,13 +37,12 @@ public class TransferController {
     }
 
     @PostMapping()
-    public boolean createTransfer(@RequestBody TransferDTO transferDTO) {
+    public boolean createTransfer(@Valid @RequestBody TransferDTO transferDTO) {
         return transferDao.createTransfer(transferDTO);
     }
 
-    @PutMapping("/update/{transferId}")
-    public boolean updateTransferStatus(@RequestBody TransferDTO transferDTO, @PathVariable Long transferId) {
-        // TODO - does this need a Path Variable anymore?
+    @PutMapping("/update")
+    public boolean updateTransferStatus(@Valid @RequestBody TransferDTO transferDTO) {
             return transferDao.updateTransferStatus(transferDTO);
     }
 
@@ -50,9 +50,6 @@ public class TransferController {
     public Transfer getTransferDetails(@PathVariable Long transferId) {
         return transferDao.convertFromDTO(transferId);
     }
-
-
-
 
 
 

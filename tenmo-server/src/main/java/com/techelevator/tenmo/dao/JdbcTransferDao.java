@@ -1,8 +1,8 @@
 package com.techelevator.tenmo.dao;
 
-import com.techelevator.tenmo.exceptions.TransferAmountZeroOrLessException;
+import com.techelevator.tenmo.exceptions.InsufficentFundsException;
+import com.techelevator.tenmo.exceptions.TransferIdDoesNotExistException;
 import com.techelevator.tenmo.model.Transfer;
-import com.techelevator.tenmo.model.TransferDto;
 import com.techelevator.tenmo.model.TransferDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -27,7 +27,6 @@ public class JdbcTransferDao implements TransferDao {
     }
 
     @Override
-    // TODO check exception handling
     public List<Transfer> findByAccountId(Long accountId) {
         List<Transfer> transfers = new ArrayList<>();
         String sql = "SELECT transfer_id, transfer_type_desc, transfer_status_desc, user_from.username AS user_from, user_to.username AS user_to, amount " +
@@ -48,20 +47,20 @@ public class JdbcTransferDao implements TransferDao {
     }
 
     @Override // locating transfer by id
-    // TODO Check exception handling
     public TransferDTO findByTransferId(Long id) {
         TransferDTO transferDTO = null;
         String sql = "SELECT * FROM transfer WHERE transfer_id = ?";
         SqlRowSet results = jdbcTemplate.queryForRowSet(sql, id);
         if (results.next()) {
              transferDTO = mapRowToTransferDTO(results);
+        } else {
+            throw new TransferIdDoesNotExistException();
         }
         return transferDTO;
     }
 
 
     @Override // sending actual transfer to user
-    // TODO Check exception handling
     public boolean createTransfer(TransferDTO transferDTO) {
         String sql = "INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount) " +
                 "VALUES (?, ?, ?, ?, ?)";
@@ -69,20 +68,17 @@ public class JdbcTransferDao implements TransferDao {
         try {
             jdbcTemplate.update(sql, transferDTO.getTransferTypeId(), transferDTO.getTransferStatusId(),
                     transferDTO.getAccountFrom(), transferDTO.getAccountTo(), transferDTO.getAmount());
-            if(transferDTO.getTransferTypeId() == 2) {
+            if (transferDTO.getTransferTypeId() == 2) {
                 executeTransfer(transferDTO);
             }
             success = true;
-        } catch (TransferAmountZeroOrLessException e) {
-            System.out.println(e.getMessage());
-        } catch (DataAccessException e) {
-            System.out.println("Error accessing data");
+        } catch (DataAccessException e) { //generic family of runtime exceptions
+            throw new InsufficentFundsException(e.getMessage());
         }
         return success;
     }
 
     @Override
-    // TODO Check exception handling
     public boolean updateTransferStatus(TransferDTO transferDTO) {
         String sql = "UPDATE transfer SET transfer_status_id = ?" +
                 "WHERE transfer_id = ?;";
@@ -94,7 +90,7 @@ public class JdbcTransferDao implements TransferDao {
             }
             success = true;
         } catch (DataAccessException e) {
-            System.out.println("Error accessing data");
+            throw new TransferIdDoesNotExistException();
         }
         return success;
     }
