@@ -14,6 +14,8 @@ import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 
 public class TransferService {
 
@@ -42,27 +44,35 @@ public class TransferService {
             } return success;
         }
 
-        public void updateTransferStatus(AuthenticatedUser authenticatedUser, Long transferId, int choice) {
+        public boolean updateTransferStatus(AuthenticatedUser authenticatedUser, Long transferId, int choice) {
+            boolean success = false;
             choice++;
             TransferDto transferDto = getTransferDtoByTransferId(authenticatedUser, transferId);
             transferDto.setTransferStatusId(choice);
             HttpEntity<TransferDto> entity = makeTransferEntity(authenticatedUser, transferDto);
             try {
-                restTemplate.exchange(baseUrl + "/update/" + transferDto.getTransferId(), HttpMethod.PUT, entity, Boolean.class);
+                restTemplate.exchange(baseUrl + "/update", HttpMethod.PUT, entity, Boolean.class);
+                success = true;
             } catch (RestClientResponseException | ResourceAccessException e) {;
                 BasicLogger.log(e.getMessage());
             }
+            return success;
         }
 
-        public Transfer[] getAllTransfersByAccountId(AuthenticatedUser authenticatedUser, Long accountId) {
+        public Map<Long, Transfer> getAllTransfersByAccountId(AuthenticatedUser authenticatedUser, Long accountId) {
+            Map<Long, Transfer> transferMap = new HashMap<>();
             HttpEntity<Void> entity = makeAuthEntity(authenticatedUser);
             Transfer[] allTransfers = null;
             try {
                 allTransfers = restTemplate.exchange(baseUrl + "/user/" + accountId, HttpMethod.GET, entity, Transfer[].class).getBody();
+                for(Transfer t : allTransfers) {
+                    transferMap.put(t.getTransferId(), t);
+
+                }
             } catch (RestClientResponseException | ResourceAccessException e) {;
                 BasicLogger.log(e.getMessage());
             }
-            return allTransfers;
+            return transferMap;
         }
 
         public Transfer getTransferByTransferId(AuthenticatedUser authenticatedUser, Long transferId) {
