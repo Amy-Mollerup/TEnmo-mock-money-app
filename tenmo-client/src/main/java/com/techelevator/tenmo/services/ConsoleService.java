@@ -53,10 +53,11 @@ public class ConsoleService {
     }
 
     public void printTransferUpdateChoiceMenu() {
+        System.out.println();
         System.out.println("1: Approve");
         System.out.println("2: Reject");
         System.out.println("0: Don't approve or reject");
-        System.out.println();
+        lineBreak();
     }
 
     public UserCredentials promptForCredentials() {
@@ -102,7 +103,11 @@ public class ConsoleService {
     }
 
     public void printCurrentBalance(BigDecimal balance) {
-            System.out.println("Your current account balance is: " + balance);
+            System.out.println("Your current account balance is: $" + balance);
+    }
+
+    public void lineBreak() {
+        System.out.println("---------");
     }
 
     public void printUsers(Map<Long, User> allUsers) {
@@ -110,7 +115,7 @@ public class ConsoleService {
         for(User user : allUsers.values()) {
             System.out.printf(smallColumnFormat, user.getId(), user.getUsername());
         }
-        System.out.println("---------");
+        lineBreak();
     }
 
     public void printHeaders(String menuTitle, String field2, boolean amount) {
@@ -128,9 +133,10 @@ public class ConsoleService {
         printHeaders("Pending Transfers", "To", true);
         for (Transfer t : transfers.values()) {
             if (t.getTransferStatus().equals("Pending") && t.getAccountFrom().equals(username)) {
-                System.out.printf(largeColumnFormat, t.getTransferId(), t.getAccountTo(), t.getAmount().toString());
+                System.out.printf(largeColumnFormat, t.getTransferId(), t.getAccountTo(), "$" + t.getAmount().toString());
             }
         }
+        lineBreak();
     }
 
 
@@ -139,12 +145,13 @@ public class ConsoleService {
         for (Transfer t : transfers.values()) {
             if(!t.getTransferStatus().equals("Pending")) {
                 if (t.getTransferType().equals("Request")) {
-                    System.out.printf(largeColumnFormat, t.getTransferId(), "From: " + t.getAccountFrom(), t.getAmount().toString());
+                    System.out.printf(largeColumnFormat, t.getTransferId(), "From: " + t.getAccountFrom(), "$" + t.getAmount().toString());
                 } else {
-                    System.out.printf(largeColumnFormat, t.getTransferId(), "To:   " + t.getAccountTo(), t.getAmount().toString());
+                    System.out.printf(largeColumnFormat, t.getTransferId(), "To:   " + t.getAccountTo(), "$" + t.getAmount().toString());
                 }
             }
         }
+        lineBreak();
     }
 
     public void printTransferDetails(Transfer transfer) {
