@@ -84,15 +84,17 @@ public class JdbcTransferDao implements TransferDao {
         String sql = "UPDATE transfer SET transfer_status_id = ?" +
                 "WHERE transfer_id = ?;";
         boolean success = false;
-        lines = jdbcTemplate.update(sql, transferDTO.getTransferStatusId(), transferDTO.getTransferId());
-        if(lines == 0) {
-            throw new TransferIdDoesNotExistException();
-        }
+
         if (transferDTO.getTransferStatusId() == 2) {
             executeTransfer(transferDTO);
             success = true;
         } else if (transferDTO.getTransferStatusId() == 3) {
             success = true;
+        }
+
+        lines = jdbcTemplate.update(sql, transferDTO.getTransferStatusId(), transferDTO.getTransferId());
+        if(lines == 0) {
+            throw new TransferIdDoesNotExistException();
         }
         return success;
     }
